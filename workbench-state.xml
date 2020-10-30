@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbench-state>
+  <properties>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToGridPolicy - ENABLED</key>
+      <value class="java.lang.Boolean">false</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.SelectionStyllingOptionsPanel SELECTION_STYLE_POINT_FORM</key>
+      <value class="java.lang.String">SQUARE</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.plugin.view.EasyPanelEZ_LIST_KEY</key>
+      <value class="java.util.ArrayList">
+        <item class="java.lang.String">右键点击指定按钮F1</item>
+        <item class="java.lang.String">右键点击指定按钮F2</item>
+        <item class="java.lang.String">右键点击指定按钮F3</item>
+        <item class="java.lang.String">右键点击指定按钮F4</item>
+        <item class="java.lang.String">右键点击指定按钮F5</item>
+        <item class="java.lang.String">右键点击指定按钮F6</item>
+        <item class="java.lang.String">右键点击指定按钮F7</item>
+        <item class="java.lang.String">右键点击指定按钮F8</item>
+        <item class="java.lang.String">右键点击指定按钮F9</item>
+        <item class="java.lang.String">右键点击指定按钮F10</item>
+      </value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - WIDTH_KEY</key>
+      <value class="java.lang.Integer">1034</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - MAXIMIZED_KEY</key>
+      <value class="java.lang.Boolean">false</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - HEIGHT_KEY</key>
+      <value class="java.lang.Integer">818</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToVerticesPolicy - ENABLED</key>
+      <value class="java.lang.Boolean">false</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_2</key>
+      <value class="java.lang.Integer">-1</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_3</key>
+      <value class="java.lang.Integer">-1</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.SelectionStyllingOptionsPanel SELECTION_STYLE_COLOR</key>
+      <value class="java.awt.Color">255, 255, 0, 255</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_4</key>
+      <value class="java.lang.Integer">-1</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - VERTICAL_KEY</key>
+      <value class="java.lang.Integer">23</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.PROJECTS</key>
+      <value class="java.util.LinkedHashSet" />
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.datastore.ConnectionManager - CONNECTION DESCRIPTORS</key>
+      <value class="java.util.ArrayList" />
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.FILES</key>
+      <value class="java.util.LinkedHashSet">
+        <item class="java.lang.String">/Users/gungnir/Downloads/shapefiles_dresden/gis_osm_natural_07_1.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/departement22.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/frenchprovinces.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/hedgerow.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/landcover2000.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/municipalities22.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/subwatershed.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/waternetwork.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/watershed.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/wsmunicipalities.shp</item>
+      </value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_1</key>
+      <value class="java.lang.Integer">-1</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.SelectionStyllingOptionsPanel SELECTION_STYLE_POINT_SIZE</key>
+      <value class="java.lang.Integer">5</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.datasource.LoadFileDataSourceQueryChooser - FILE CHOOSER DIRECTORY</key>
+      <value class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - HORIZONTAL_KEY</key>
+      <value class="java.lang.Integer">383</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToFeaturesPolicy - ENABLED</key>
+      <value class="java.lang.Boolean">false</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.plugin.file.open.OpenProjectWizard - FILE CHOOSER DIRECTORY</key>
+      <value class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">class com.vividsolutions.jump.workbench.ui.snap.GridRenderer - ENABLED</key>
+      <value class="java.lang.Boolean">false</value>
+    </mapping>
+  </properties>
+</workbench-state>
+
