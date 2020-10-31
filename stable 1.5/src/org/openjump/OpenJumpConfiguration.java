@@ -59,6 +59,7 @@ import org.openjump.core.ui.plugin.mousemenu.category.MoveCategoryToTop;
 import org.openjump.core.ui.plugin.mousemenu.category.SetCategoryVisibilityPlugIn;
 import org.openjump.core.ui.plugin.style.ImportArcMapStylePlugIn;
 import org.openjump.core.ui.plugin.style.ImportSLDPlugIn;
+import org.openjump.core.ui.plugin.validation.TestPlugin;
 import org.openjump.core.ui.plugin.view.EasyButtonsPlugin;
 import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
 import org.openjump.core.ui.plugin.view.ShowFullPathPlugIn;
@@ -161,6 +162,9 @@ public class OpenJumpConfiguration {
     imageSvgPlugin.initialize(new PlugInContext(workbenchContext, null, null,
       null, null));
 	*/
+    
+    TestPlugin test = new TestPlugin();
+    test.initialize(pluginContext);
     
     /***************************************************************************
      * menu EDIT
