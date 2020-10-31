@@ -163,9 +163,6 @@ public class OpenJumpConfiguration {
       null, null));
 	*/
     
-    TestPlugin test = new TestPlugin();
-    test.initialize(pluginContext);
-    
     /***************************************************************************
      * menu EDIT
      **************************************************************************/
