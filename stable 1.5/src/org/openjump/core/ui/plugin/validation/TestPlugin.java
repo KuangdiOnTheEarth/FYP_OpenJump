@@ -25,13 +25,23 @@ public class TestPlugin extends AbstractUiPlugIn {
     public void initialize(PlugInContext context) throws Exception {
     	sName = I18N.get("org.openjump.core.ui.plugin.validation.TestPlugin");
     	
-    	WorkbenchContext workbenchContext = context.getWorkbenchContext();
-    	FeatureInstaller featureInstaller = new FeatureInstaller(workbenchContext);
-
-        // Add File Menu
-        featureInstaller.addMainMenuItem(new String[] {
-          MenuNames.FILE
-        }, this, 7);
+    	context.getFeatureInstaller().addMainMenuItem(this,
+    			new String[] { "Validation", "Test" }, getName(), false, null, null);
+    	
+//    	WorkbenchContext workbenchContext = context.getWorkbenchContext();
+//    	FeatureInstaller featureInstaller = new FeatureInstaller(workbenchContext);
+//
+//        // Add File Menu
+//        featureInstaller.addMainMenuItem(new String[] {
+//          MenuNames.FILE
+//        }, this, 7);
+    }
+    
+    public boolean execute(PlugInContext context) throws Exception { 
+    	context.getWorkbenchFrame().getOutputFrame().createNewDocument(); 
+    	context.getWorkbenchFrame().getOutputFrame().addText("Hello, World!"); 
+    	context.getWorkbenchFrame().getOutputFrame().surface();
+    	return true;
     }
     
     public ImageIcon getIcon() {
