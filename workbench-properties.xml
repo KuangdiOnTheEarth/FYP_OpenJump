@@ -1,3 +1,4 @@
 <workbench>
-	<plug-in>org.openjump.core.ui.plugin.validation.TestPlugin</plug-in>
+	<plug-in>org.openjump.core.ui.plugin.validation.RandomBuffer</plug-in>
+	<plug-in>org.openjump.core.ui.plugin.validation.BufferFeaturesFromLayerPlugIn</plug-in>
 </workbench>

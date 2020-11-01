@@ -26,7 +26,7 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - WIDTH_KEY</key>
-      <value class="java.lang.Integer">1034</value>
+      <value class="java.lang.Integer">1282</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - MAXIMIZED_KEY</key>
@@ -72,15 +72,15 @@
       <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.FILES</key>
       <value class="java.util.LinkedHashSet">
         <item class="java.lang.String">/Users/gungnir/Downloads/shapefiles_dresden/gis_osm_natural_07_1.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/departement22.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/frenchprovinces.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/hedgerow.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/landcover2000.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/municipalities22.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/subwatershed.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/waternetwork.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/watershed.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/wsmunicipalities.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/watershed.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/hedgerow.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/frenchprovinces.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/landcover2000.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/subwatershed.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/departement22.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/municipalities22.shp</item>
       </value>
     </mapping>
     <mapping>
@@ -97,7 +97,7 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - HORIZONTAL_KEY</key>
-      <value class="java.lang.Integer">383</value>
+      <value class="java.lang.Integer">158</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToFeaturesPolicy - ENABLED</key>

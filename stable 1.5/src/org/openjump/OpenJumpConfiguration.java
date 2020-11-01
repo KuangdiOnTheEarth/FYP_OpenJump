@@ -59,7 +59,7 @@ import org.openjump.core.ui.plugin.mousemenu.category.MoveCategoryToTop;
 import org.openjump.core.ui.plugin.mousemenu.category.SetCategoryVisibilityPlugIn;
 import org.openjump.core.ui.plugin.style.ImportArcMapStylePlugIn;
 import org.openjump.core.ui.plugin.style.ImportSLDPlugIn;
-import org.openjump.core.ui.plugin.validation.TestPlugin;
+import org.openjump.core.ui.plugin.validation.RandomBuffer;
 import org.openjump.core.ui.plugin.view.EasyButtonsPlugin;
 import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
 import org.openjump.core.ui.plugin.view.ShowFullPathPlugIn;
