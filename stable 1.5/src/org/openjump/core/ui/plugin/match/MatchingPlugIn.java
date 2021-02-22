@@ -55,6 +55,7 @@ import com.vividsolutions.jump.workbench.ui.renderer.style.RingVertexStyle;
 
 import org.openjump.core.ui.plugin.match.matcher.*;
 import org.openjump.core.ui.plugin.match.util.text.RuleRegistry;
+import org.openjump.core.ui.plugin.validate.SharedSpace;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -521,6 +522,14 @@ public class MatchingPlugIn extends ThreadedBasePlugIn {
         
         Layer source_layer = context.getLayerManager().getLayer(source_layer_name);
         Layer target_layer = context.getLayerManager().getLayer(target_layer_name);
+        
+		//////////////////////////////////////////////////////////////////////////
+		// Store source & target layers into sharedSpace
+		//////////////////////////////////////////////////////////////////////////
+        SharedSpace sharedSpace = SharedSpace.getInstance();
+        sharedSpace.storeLayers(source_layer, target_layer);
+        
+        
         FeatureCollection source_fc = source_layer.getFeatureCollectionWrapper();
         FeatureCollection target_fc = target_layer.getFeatureCollectionWrapper();
         if (source_layer == null || target_layer ==  null) {

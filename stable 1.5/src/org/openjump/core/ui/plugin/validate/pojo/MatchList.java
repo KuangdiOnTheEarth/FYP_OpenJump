@@ -11,27 +11,33 @@ import com.vividsolutions.jump.feature.Feature;
  */
 public class MatchList {
 	
-	private ArrayList<Feature> sourceFeatureList; 
-	private ArrayList<Feature> targetFeatureList; 
+	private ArrayList<Feature> sourceFeatureList = null; 
+	private ArrayList<Feature> targetFeatureList = null; 
+	private ArrayList<Integer> validationStatuses = null;
+	private final int UNDISCOVERED = 0;
+	private final int INQUEUE      = 1;
+	private final int INVALID      = 2;
+	private final int VALID        = 3;
+	
 	
 	public MatchList() {
 		sourceFeatureList = new ArrayList<Feature>();
 		targetFeatureList = new ArrayList<Feature>();
+		validationStatuses = new ArrayList<Integer>();
 	}
 	
 	public void storeMatch(Feature sourceFeature, Feature targetFeature) {
 		sourceFeatureList.add(sourceFeature);
 		targetFeatureList.add(targetFeature);
+		validationStatuses.add(UNDISCOVERED);
 	}
 	
 	public Feature getSourceFeatureByIndex(int i) {
 		return sourceFeatureList.get(i);
 	}
-	
 	public Feature getTargetFeatureByIndex(int i) {
 		return targetFeatureList.get(i);
 	}
-	
 	/**
 	 * Return the Feature object of corresponding geographic object in target layer (according to the stored matches)
 	 * @param sourceFeature an object in source layer 
@@ -40,7 +46,6 @@ public class MatchList {
 	public Feature getMatchedTargetFeature(Feature sourceFeature) {
 		return targetFeatureList.get(sourceFeatureList.indexOf(sourceFeature));
 	}
-
 	/**
 	 * Return the Feature object of corresponding geographic object in source layer (according to the stored matches)
 	 * @param targetFeature an object in target layer 
@@ -50,4 +55,25 @@ public class MatchList {
 		return sourceFeatureList.get(targetFeatureList.indexOf(targetFeature));
 	}
 	
+	
+	public int numberOfFeatures() {
+		if (sourceFeatureList.size() == targetFeatureList.size() && sourceFeatureList.size() == validationStatuses.size()) {
+			return sourceFeatureList.size();
+		} else {
+			return -1;
+		}
+	}
+	
+	
+	public void setAsInQueue(int index) {
+		validationStatuses.set(index, INQUEUE);
+	}
+	
+	public void setAsInvalid(int index) {
+		validationStatuses.set(index, INVALID);
+	}
+	
+	public void setAsValid(int index) {
+		validationStatuses.set(index, VALID);
+	}
 }

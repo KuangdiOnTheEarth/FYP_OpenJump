@@ -2,9 +2,14 @@ package org.openjump.core.ui.plugin.validate;
 
 import org.openjump.core.ui.plugin.validate.pojo.MatchList;
 
+import com.vividsolutions.jump.workbench.model.Layer;
+
 public class SharedSpace {
 
 	private static SharedSpace singleSharedSpace;
+	
+	private Layer sourceLayer = null;
+	private Layer targetLayer = null;
 	
 	private MatchList matchList = null;
 	
@@ -30,5 +35,19 @@ public class SharedSpace {
 	
 	public MatchList getMatchList() {
 		return this.matchList;
+	}
+	
+	
+	public void storeLayers(Layer sourceLayer, Layer targetLayer) {
+		this.sourceLayer = sourceLayer;
+		this.targetLayer = targetLayer;
+	}
+	
+	public Layer getSourceLayer() {
+		return sourceLayer;
+	}
+	
+	public Layer getTargetLayer() {
+		return targetLayer;
 	}
 }
