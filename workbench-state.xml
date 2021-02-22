@@ -58,7 +58,7 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - VERTICAL_KEY</key>
-      <value class="java.lang.Integer">23</value>
+      <value class="java.lang.Integer">54</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.PROJECTS</key>
@@ -71,9 +71,6 @@
     <mapping>
       <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.FILES</key>
       <value class="java.util.LinkedHashSet">
-        <item class="java.lang.String">/Users/gungnir/Downloads/shapefiles_dresden/gis_osm_natural_07_1.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/waternetwork.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/wsmunicipalities.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/watershed.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/hedgerow.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/frenchprovinces.shp</item>
@@ -81,6 +78,9 @@
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/subwatershed.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/departement22.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/municipalities22.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/OrdnanceSurvey/OS VectorMap District (ESRI Shape File) SW/data/SW_Building.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/tapiquen/USA_Counties/USA_Counties.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/statsilk/StatPlanet_USA_County/map/map.shp</item>
       </value>
     </mapping>
     <mapping>
@@ -93,11 +93,11 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.datasource.LoadFileDataSourceQueryChooser - FILE CHOOSER DIRECTORY</key>
-      <value class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata</value>
+      <value class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/OrdnanceSurvey/OS VectorMap District (ESRI Shape File) SW/data</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - HORIZONTAL_KEY</key>
-      <value class="java.lang.Integer">158</value>
+      <value class="java.lang.Integer">45</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToFeaturesPolicy - ENABLED</key>
@@ -105,7 +105,7 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">org.openjump.core.ui.plugin.file.open.OpenProjectWizard - FILE CHOOSER DIRECTORY</key>
-      <value class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata</value>
+      <value class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/statsilk/StatPlanet_USA_County/map</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">class com.vividsolutions.jump.workbench.ui.snap.GridRenderer - ENABLED</key>

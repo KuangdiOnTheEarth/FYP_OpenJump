@@ -59,7 +59,12 @@ import org.openjump.core.ui.plugin.mousemenu.category.MoveCategoryToTop;
 import org.openjump.core.ui.plugin.mousemenu.category.SetCategoryVisibilityPlugIn;
 import org.openjump.core.ui.plugin.style.ImportArcMapStylePlugIn;
 import org.openjump.core.ui.plugin.style.ImportSLDPlugIn;
-import org.openjump.core.ui.plugin.validation.RandomBuffer;
+import org.openjump.core.ui.plugin.tools.CreateThiessenPolygonsPlugIn;
+import org.openjump.core.ui.plugin.tools.IntersectPolygonLayersPlugIn;
+import org.openjump.core.ui.plugin.tools.JoinAttributesSpatiallyPlugIn;
+import org.openjump.core.ui.plugin.tools.PlanarGraphPlugIn;
+import org.openjump.core.ui.plugin.tools.UnionByAttributePlugIn;
+import org.openjump.core.ui.plugin.validate.RandomBuffer;
 import org.openjump.core.ui.plugin.view.EasyButtonsPlugin;
 import org.openjump.core.ui.plugin.view.MapToolTipPlugIn;
 import org.openjump.core.ui.plugin.view.ShowFullPathPlugIn;
@@ -96,6 +101,7 @@ import com.vividsolutions.jump.workbench.ui.LayerViewPanel;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 import com.vividsolutions.jump.workbench.ui.plugin.PersistentBlackboardPlugIn;
+import com.vividsolutions.jump.workbench.ui.plugin.analysis.ConvexHullPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.datastore.RunDatastoreQueryPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.imagery.AddImageLayerPlugIn;
 import com.vividsolutions.jump.workbench.ui.renderer.RenderingManager;
@@ -269,7 +275,7 @@ public class OpenJumpConfiguration {
      **************************************************************************/
     
     /** ** ANALYSIS *** */
-    /*
+    
     JoinAttributesSpatiallyPlugIn mySpatialJoin = new JoinAttributesSpatiallyPlugIn();
     mySpatialJoin.initialize(new PlugInContext(workbenchContext, null, null,
       null, null));
@@ -286,9 +292,9 @@ public class OpenJumpConfiguration {
     UnionByAttributePlugIn unionByAttribute = new UnionByAttributePlugIn();
     unionByAttribute.initialize(new PlugInContext(workbenchContext,
   	      null, null, null, null)); 
-    */
+    
     /** ** GENERATE *** */
-    /*
+    
     ConvexHullPlugIn myConvHullPlugIn = new ConvexHullPlugIn();
     myConvHullPlugIn.initialize(new PlugInContext(workbenchContext, null, null,
       null, null));
@@ -296,7 +302,7 @@ public class OpenJumpConfiguration {
     CreateThiessenPolygonsPlugIn myThiessenPlugin = new CreateThiessenPolygonsPlugIn();
     myThiessenPlugin.initialize(new PlugInContext(workbenchContext, null, null,
       null, null));
-	*/
+	
     /** ** QUERY *** */
     /*
     SimpleQueryPlugIn mySimpleQueryPlugIn = new SimpleQueryPlugIn();
