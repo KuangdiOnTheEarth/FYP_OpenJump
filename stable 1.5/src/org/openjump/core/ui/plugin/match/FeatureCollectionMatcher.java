@@ -35,6 +35,8 @@ import com.vividsolutions.jump.feature.Feature;
 
 import org.openjump.core.ui.plugin.match.matcher.*;
 import org.openjump.core.ui.plugin.match.util.text.Rule;
+import org.openjump.core.ui.plugin.validate.SharedSpace;
+import org.openjump.core.ui.plugin.validate.pojo.MatchList;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -151,6 +153,9 @@ public class FeatureCollectionMatcher {
         //System.out.println("geometryMatcher.minOverlapping = " + minOverlapping);
         STRtree index = indexFeatureCollection(target);
         // For each feature of the source collection
+        
+        MatchList matchList = new MatchList();
+        
         for (Feature f1 : source) {
             //System.out.println("Feature " + f1.getID());
             Geometry g1 = f1.getGeometry();
@@ -166,8 +171,13 @@ public class FeatureCollectionMatcher {
                 double score = geometryMatcher.match(f1, f2, null);
                 if (score > 0.0) {
                     matchMap.add(new Match(f1, f2, score));
-                    System.out.println("source: " + f1.getID() + " -- target: " + f2.getID());
                     count++;
+                    
+                    //////////////////////////////////////////////////////////////////////////
+                    // Store the matches, to be used in the validation process
+                    //////////////////////////////////////////////////////////////////////////
+                    System.out.println("source: " + f1.getID() + " -- target: " + f2.getID());
+                    matchList.storeMatch(f1, f2);
                 }
             }
             
@@ -196,6 +206,13 @@ public class FeatureCollectionMatcher {
                 }
             }
         }
+        
+		//////////////////////////////////////////////////////////////////////////
+		// Store the matchList into SharedSpace
+		//////////////////////////////////////////////////////////////////////////
+        SharedSpace sharedSpace = SharedSpace.getInstance();
+        sharedSpace.storeMatchList(matchList);
+        
         System.out.println("Direct Geometry Matching done in " + (System.currentTimeMillis()-t0) + " ms");
         return matchMap;
     }
