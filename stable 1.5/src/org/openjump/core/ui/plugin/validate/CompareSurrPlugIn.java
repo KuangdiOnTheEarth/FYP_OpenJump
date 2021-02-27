@@ -29,7 +29,14 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
-public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
+
+/**
+ * Part of the validation PluIn, randomly find one match and calculate its context similarity, print the surrounding objects in new layer 
+ * @author Kuangdi
+ *
+ */
+
+public class CompareSurrPlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
 	private SharedSpace sharedSpace;
 	private MatchList matchList;
@@ -44,7 +51,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	    featureInstaller.addMainMenuItem(
 	    	        this,
 	                new String[] {"Kuangdi"}, 	//menu path
-	                this.getName(),
+	                "Compare Surrounding",
 	                false,			//checkbox
 	                null,			//icon
 	                createEnableCheck(context.getWorkbenchContext())); //enable check
@@ -81,82 +88,48 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		while (!queue.isEmpty()) {
 			// create a buffer surrounding the being checked feature
 			Feature sourceFeature = matchList.getSourceFeatureByIndex(queue.poll());
+			Geometry sfGeom = sourceFeature.getGeometry();
+			Point sfCentroid =  sfGeom.getCentroid();
+			Geometry buffer = sfCentroid.buffer(bufferRadius);
 			
-			double contextSimilarity = calContextSimilarityFor(sourceFeature, sourceFeatures, targetFeatures, true, context);
+			// create a feature collection to visualize surrounding features in a new layer 
+			FeatureCollection surrColl = null; // the feature collection of surrounding objects of a source layer feature
+	        FeatureSchema fs = sourceFeature.getSchema();
+	        surrColl = new FeatureDataset(fs);
+	        // add the buffer into feature collection
+	        Feature bufferFeature = sourceFeature.clone(false);
+	        bufferFeature.setGeometry(buffer);
+	        surrColl.add(bufferFeature);
+	        
+	        // create lists to contain the surrounding objects
+	        ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
+//	        ArrayList<Feature> targetSurr = null;
+	        
+			for (Feature f : sourceFeatures) {
+				if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
+					surrColl.add(f.clone(false)); 
+					Feature cp = f.clone(false);
+					cp.setGeometry(f.getGeometry().getCentroid());
+					surrColl.add(cp);
+					sourceSurr.add(f);
+				}
+			}
+			
+			context.addLayer(StandardCategoryNames.WORKING, "surrounding", surrColl);
+//			System.out.println(selfMark + "added layer: surrounding objects of " + sourceFeature.getID() + "( target layer: " + matchList.getMatchedTargetFeature(sourceFeature).getID() + ")");
+			
+//			System.out.println("Ordering AntiClockwise sequences...");
+			AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
+			AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), matchList.getMatchedTargetFeature(sourceFeature));
+			
+//			System.out.println("Calculating Context Similarity...");
+			System.out.print("Context Similarity:" + sourceFeature.getID() + " & " + matchList.getMatchedTargetFeature(sourceFeature).getID() + ": ");
+			double contextSimilarity = compareOrderedFeatures(sourceSeq, targetSeq);
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
 			
-			
-			// update the queue: add new matches into the queue and find the next match of being checked
-			
-			
 			System.out.println("\n");
+			// update the queue: add new matches into the queue and find the next match of being checked
 		}
-	}
-	
-	
-	/**
-	 * calculate the context similarity of a match
-	 * @param sourceFeature a feature from source layer, whose match will be checked
-	 * @param visible set as 'true' then the surrounding object will be visualized in a new layer
-	 * @return context similarity
-	 */
-	private double calContextSimilarityFor(Feature sourceFeature, List<Feature> sourceFeatures, List<Feature> targetFeatures, boolean visible, PlugInContext context) {
-		Geometry sfGeom = sourceFeature.getGeometry();
-		Point sfCentroid =  sfGeom.getCentroid();
-		Geometry buffer = sfCentroid.buffer(bufferRadius);
-		
-        // create lists to contain the surrounding objects
-        ArrayList<Feature> sourceSurr = new ArrayList<Feature>();	    
-        
-		for (Feature f : sourceFeatures) {
-			if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
-				sourceSurr.add(f);
-			}
-		}
-		
-		
-		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
-		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), matchList.getMatchedTargetFeature(sourceFeature));
-		
-		if (visible) {
-			showSurrObjectsInLayer(context, matchList.getMatchedTargetFeature(sourceFeature), buffer, sourceSurr);
-		}
-		
-		System.out.print("Context Similarity:" + sourceFeature.getID() + " & " + matchList.getMatchedTargetFeature(sourceFeature).getID() + ": ");
-		return compareOrderedFeatures(sourceSeq, targetSeq);
-	}
-	
-	
-	/**
-	 * Display the surrounding objects of a center objects (in target layer by default) in a new layer
-	 * @param context
-	 * @param centerFeature
-	 * @param buffer
-	 * @param surrList
-	 */
-	private void showSurrObjectsInLayer(PlugInContext context, Feature centerFeature, Geometry buffer, ArrayList<Feature> surrList) {
-		FeatureCollection surrColl = null;
-		FeatureSchema fs = centerFeature.getSchema();
-		surrColl = new FeatureDataset(fs);
-		
-		Feature centroid = centerFeature.clone(false);
-		centroid.setGeometry(centerFeature.getGeometry().getCentroid());
-		surrColl.add(centroid);
-		
-        Feature bufferFeature = centerFeature.clone(false);
-        bufferFeature.setGeometry(buffer);
-        surrColl.add(bufferFeature);
-		
-		for (Feature f : surrList) {
-			surrColl.add(f.clone(false)); 
-			
-			Feature centerPoint = f.clone(false);
-			centerPoint.setGeometry(f.getGeometry().getCentroid());
-			surrColl.add(centerPoint);
-		}
-		
-		context.addLayer(StandardCategoryNames.WORKING, "Surr " + centerFeature.getID(), surrColl);
-		
 	}
 
 
@@ -173,6 +146,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		return targetFeatures;
 	}
 	
+	
 	/**
 	 * order the surrounding features (or their corresponding features in target layer) anti-clockwise
 	 * @param surrFeatures
@@ -180,12 +154,14 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	 * @return
 	 */
 	private AntiClockwiseSequence orderFeaturesClockwise(ArrayList<Feature> surrFeatures, Feature center) {
+//		System.out.println("Number of surrounding objects: " + surrFeatures.size());
 		Point centerCentroid = center.getGeometry().getCentroid();
 		Double cX = centerCentroid.getX(); 
 		Double cY = centerCentroid.getY();
 		
 		AntiClockwiseSequence sequence = new AntiClockwiseSequence();
 		for (Feature f : surrFeatures) {
+//			System.out.println("Calculating RelativePosition of " + f.getID());
 			Point fCentroid = f.getGeometry().getCentroid();
 			Double fX = fCentroid.getX();
 			Double fY = fCentroid.getY();
@@ -194,9 +170,12 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			Double yDiff = fY - cY;
 			Double sin = yDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
 			Double cos = xDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
+//			System.out.println(String.format("%d: xDiff: %.4f; yDiff: %.4f; line: %.4f; sin: %.4f; cos: %.4f", f.getID(), xDiff, yDiff, Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5), sin, cos));
 			RelativePosition p = new RelativePosition(f, sin, cos);
 			sequence.add(p);
+//			System.out.println("Calculated RelativePosition of " + f.getID());
 		}
+		
 		return sequence;
 	}
 	

@@ -1,6 +1,6 @@
 <workbench>
 	<plug-in>org.openjump.core.ui.plugin.match.MatchingPlugIn</plug-in>
 	<plug-in>org.openjump.core.ui.plugin.validate.ValidatePlugIn</plug-in>
+	<plug-in>org.openjump.core.ui.plugin.validate.CompareSurrPlugIn</plug-in>
 	<plug-in>org.openjump.core.ui.plugin.validate.RandomBuffer</plug-in>
-	<plug-in>org.openjump.core.ui.plugin.validate.BufferFeaturesFromLayerPlugIn</plug-in>
 </workbench>

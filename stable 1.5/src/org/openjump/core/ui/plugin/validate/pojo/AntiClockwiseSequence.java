@@ -56,24 +56,24 @@ public class AntiClockwiseSequence {
 	
 	public Double calContextSimilarityWith(AntiClockwiseSequence target) {
 		
-		System.out.print("Source Surrounding: ");
-		for (Feature f : this.getFeatureList()) {
-			System.out.print(f.getID() + " ");
-		}
+//		System.out.print("Source Surrounding: ");
+//		for (Feature f : this.getFeatureList()) {
+//			System.out.print(f.getID() + " ");
+//		}
 
-		System.out.print("\nTarget Surrounding: ");
-		for (Feature f : target.getFeatureList()) {
-			System.out.print(f.getID() + " ");
-		}
-		System.out.print("\n sin: ");
-		for (RelativePosition rp : target.sequence) {
-			System.out.print(String.format("%.4f ", rp.sin()));
-		}
-		System.out.print("\n cos: ");
-		for (RelativePosition rp : target.sequence) {
-			System.out.print(String.format("%.4f ", rp.cos()));
-		}
-		System.out.println();
+//		System.out.print("\nTarget Surrounding: ");
+//		for (Feature f : target.getFeatureList()) {
+//			System.out.print(f.getID() + " ");
+//		}
+//		System.out.print("\n sin: ");
+//		for (RelativePosition rp : target.sequence) {
+//			System.out.print(String.format("%.4f ", rp.sin()));
+//		}
+//		System.out.print("\n cos: ");
+//		for (RelativePosition rp : target.sequence) {
+//			System.out.print(String.format("%.4f ", rp.cos()));
+//		}
+//		System.out.println();
 		
 		
 		double smallerLength = Math.min(this.size(), target.size());
@@ -123,7 +123,12 @@ public class AntiClockwiseSequence {
 			}
 		}
 		
-		System.out.println("List of non-single objects: " + corrIndices + "; maxInOrder = " + maxInOrder + "; smallerLength = " + smallerLength);
+		System.out.print("(" + (int)maxInOrder + "/" + (int)smallerLength + "): ");
+		for (Feature f : target.getFeatureList()) {
+			System.out.print(f.getID() + " ");
+		}
+		System.out.println();
+		
 		return maxInOrder / smallerLength;
 	}
 }
