@@ -13,6 +13,9 @@ public class MatchList {
 	
 	private ArrayList<Feature> sourceFeatureList = null; 
 	private ArrayList<Feature> targetFeatureList = null; 
+	private ArrayList<Double> contextSimilarties = null;
+	private ArrayList<Double> objectSimilarities = null;
+	
 	private ArrayList<Integer> validationStatuses = null;
 	private final int UNDISCOVERED = 0;
 	private final int INQUEUE      = 1;
@@ -24,12 +27,16 @@ public class MatchList {
 		sourceFeatureList = new ArrayList<Feature>();
 		targetFeatureList = new ArrayList<Feature>();
 		validationStatuses = new ArrayList<Integer>();
+		contextSimilarties = new ArrayList<Double>();
+		objectSimilarities = new ArrayList<Double>();
 	}
 	
 	public void storeMatch(Feature sourceFeature, Feature targetFeature) {
 		sourceFeatureList.add(sourceFeature);
 		targetFeatureList.add(targetFeature);
 		validationStatuses.add(UNDISCOVERED);
+		contextSimilarties.add(1.0);
+		objectSimilarities.add(1.0);
 	}
 	
 	public Feature getSourceFeatureByIndex(int i) {
@@ -75,5 +82,13 @@ public class MatchList {
 	
 	public void setAsValid(int index) {
 		validationStatuses.set(index, VALID);
+	}
+	
+	
+	public void setContextSimilarity(Feature srcFeature, Double similarity) {
+		contextSimilarties.set(sourceFeatureList.indexOf(srcFeature), similarity);
+	}
+	public void setObjectSimilarity(Feature srcFeature, Double similarity) {
+		objectSimilarities.set(sourceFeatureList.indexOf(srcFeature), similarity);
 	}
 }

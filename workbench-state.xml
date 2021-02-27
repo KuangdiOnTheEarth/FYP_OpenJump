@@ -58,7 +58,7 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - VERTICAL_KEY</key>
-      <value class="java.lang.Integer">54</value>
+      <value class="java.lang.Integer">306</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.PROJECTS</key>
@@ -79,8 +79,8 @@
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/departement22.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/municipalities22.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/OrdnanceSurvey/OS VectorMap District (ESRI Shape File) SW/data/SW_Building.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/tapiquen/USA_Counties/USA_Counties.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/statsilk/StatPlanet_USA_County/map/map.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/tapiquen/USA_Counties/USA_Counties.shp</item>
       </value>
     </mapping>
     <mapping>
@@ -97,7 +97,7 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - HORIZONTAL_KEY</key>
-      <value class="java.lang.Integer">45</value>
+      <value class="java.lang.Integer">3</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToFeaturesPolicy - ENABLED</key>

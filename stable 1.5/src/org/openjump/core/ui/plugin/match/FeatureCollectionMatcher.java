@@ -176,7 +176,7 @@ public class FeatureCollectionMatcher {
                     //////////////////////////////////////////////////////////////////////////
                     // Store the matches, to be used in the validation process
                     //////////////////////////////////////////////////////////////////////////
-                    System.out.println("source: " + f1.getID() + " -- target: " + f2.getID());
+//                    System.out.println("source: " + f1.getID() + " -- target: " + f2.getID());
                     matchList.storeMatch(f1, f2);
                 }
             }
