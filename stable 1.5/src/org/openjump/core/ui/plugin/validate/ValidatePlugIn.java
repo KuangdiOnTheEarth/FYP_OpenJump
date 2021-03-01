@@ -30,6 +30,8 @@ import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
+import javafx.util.Pair;
+
 public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
 	private final double validThreshold = 0.8; 
@@ -97,16 +99,12 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			Geometry sfGeom = sourceFeature.getGeometry();
 			Point sfCentroid =  sfGeom.getCentroid();
 			Geometry buffer = sfCentroid.buffer(bufferRadius);
-			
-			System.out.println("Queue Length: " + queue.size());
-	        // create lists to contain the surrounding objects
+	        // create lists to contain the surrounding objects, add surrounding features (matches) into queue
 	        ArrayList<Feature> sourceSurr = new ArrayList<Feature>();	    
 			for (Feature f : sourceFeatures) {
 				if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
 					sourceSurr.add(f);
-					System.out.println("--");
 					if (matchList.shouldBeQueued(f)) {
-//					if (true) {
 						queue.add(f);
 						matchList.setAsInQueue(f);
 					}
@@ -116,33 +114,15 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 //			showSurrObjectsInLayer(context, sourceFeature, buffer, sourceSurr);
 			
 			// record the dependency
-			System.out.println("Recording Surrouding Objects");
 			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr);
-			System.out.println("Adding undiscovered objects into queue...(" + sourceSurr.size() + ")");
-			// add surrounding features (matches) into queue
-//			for (Feature f : sourceSurr) {
-//				if (matchList.shouldBeQueued(f)) {
-//					System.out.print(f.getID() + " ");
-//					queue.offer(f);
-//					System.out.print("Setting as inQueue...");
-//					matchList.setAsInQueue(f);
-//					System.out.println("Done");
-//				} else {
-//					System.out.println("No need");
-//				}
-//			}
 
 			// calculate context similarity
-			System.out.println("Calculating context similarity...");
 			double contextSimilarity = calContextSimilarityFor(sourceFeature, sourceSurr);
-			System.out.println("Setting context similarity...");
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
 			// backtrack if the match is considered as invalid
 			if (contextSimilarity >= validThreshold) {
-				System.out.println("Setting as Valid...");
 				matchList.setAsValid(sourceFeature);
 			} else {
-				System.out.println("Setting as Invalid...");
 				matchList.setAsInvalid(sourceFeature);
 				backtrack(sourceFeature, supportingRelations);
 			}
@@ -152,6 +132,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			
 		}
 		
+		showResult(context);
 		System.out.println("Validation Finished \n");
 
 	}
@@ -159,6 +140,13 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
 	private void backtrack(Feature invalidFeature, SupportingRelations supportingRelations) {
 		System.out.println("--BackTrack: " + invalidFeature.getID() + "--");
+	}
+	
+	
+	private void showResult(PlugInContext context) {		
+		Pair<FeatureCollection, FeatureCollection> pair = matchList.getValidationResult();
+		context.addLayer(StandardCategoryNames.WORKING, "Valid Matches", pair.getKey());
+		context.addLayer(StandardCategoryNames.WORKING, "Invalid Matches", pair.getValue());
 	}
 	
 	

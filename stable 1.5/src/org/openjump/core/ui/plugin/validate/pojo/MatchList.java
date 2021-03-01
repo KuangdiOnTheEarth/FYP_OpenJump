@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.vividsolutions.jump.feature.Feature;
+import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.feature.FeatureDataset;
+import com.vividsolutions.jump.feature.FeatureSchema;
+
+import javafx.util.Pair;
 
 /**
  * This class is used to store the matches to be validated
@@ -97,15 +102,13 @@ public class MatchList {
 	public boolean shouldBeQueued(Feature sourceFeature) {
 		int i = sourceFeatureList.indexOf(sourceFeature);
 		if (i == -1) {
-			System.out.println("This feature in not found in match records");
+//			System.out.println("This feature in not found in match records");
 			return false;
 		}
 //		if (!hMap.containsKey(sourceFeature.getID()) && hMap.get(sourceFeature.getID()) == UNDISCOVERED) {
 		if (validationStatuses.get(i) == UNDISCOVERED) {
-			System.out.println("index = " + i + ", should be queued");
 			return true;
 		} else {
-			System.out.println("index = " + i + ", no need to be queued");
 			return false;
 		}
 	}
@@ -140,5 +143,22 @@ public class MatchList {
 	}
 	public void setObjectSimilarity(Feature srcFeature, Double similarity) {
 		objectSimilarities.set(sourceFeatureList.indexOf(srcFeature), similarity);
+	}
+	
+	
+	public Pair<FeatureCollection, FeatureCollection> getValidationResult() {
+		FeatureCollection validColl = null;
+		FeatureCollection invalidColl = null;
+		FeatureSchema fs = sourceFeatureList.get(0).getSchema();
+		validColl = new FeatureDataset(fs);
+		invalidColl = new FeatureDataset(fs);
+		for (int i = 0; i < sourceFeatureList.size(); i++) {
+			if (validationStatuses.get(i) == VALID) {
+				validColl.add(sourceFeatureList.get(i).clone(false));
+			} else if (validationStatuses.get(i) == INVALID) {
+				invalidColl.add(sourceFeatureList.get(i).clone(false));
+			}
+		}
+		return new Pair<FeatureCollection, FeatureCollection>(validColl, invalidColl);
 	}
 }
