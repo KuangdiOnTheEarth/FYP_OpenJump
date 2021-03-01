@@ -80,7 +80,7 @@ public class CompareSurrPlugIn extends AbstractUiPlugIn implements ThreadedPlugI
 		}
 		int startingIndex = random.nextInt(numFeatures);
 		queue.offer(startingIndex);
-		matchList.setAsInQueue(startingIndex);
+		matchList.setAsInQueue(matchList.getSourceFeatureByIndex(startingIndex));
 		
 		final List<Feature> sourceFeatures = sharedSpace.getSourceLayer().getFeatureCollectionWrapper().getFeatures();
 		final List<Feature> targetFeatures = sharedSpace.getTargetLayer().getFeatureCollectionWrapper().getFeatures();

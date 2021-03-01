@@ -69,8 +69,7 @@ public class RelativePosition {
 //				}
 			}
 		}
-		System.out.print("--RelativePosition-- None of the case is met in method'isAntiClockwiseThan' "
-				+ "for " + this.feature.getID() + " and " + p.feature().getID());
+		System.out.print("--RelativePosition-- None of the case is met in method'isAntiClockwiseThan' with this.sin=" + this.sin);
 		return false;
 	}
 

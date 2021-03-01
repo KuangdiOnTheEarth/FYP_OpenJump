@@ -1,6 +1,7 @@
 package org.openjump.core.ui.plugin.validate.pojo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.vividsolutions.jump.feature.Feature;
 
@@ -15,6 +16,7 @@ public class MatchList {
 	private ArrayList<Feature> targetFeatureList = null; 
 	private ArrayList<Double> contextSimilarties = null;
 	private ArrayList<Double> objectSimilarities = null;
+//	private HashMap<Integer, Integer> hMap = null;
 	
 	private ArrayList<Integer> validationStatuses = null;
 	private final int UNDISCOVERED = 0;
@@ -29,6 +31,16 @@ public class MatchList {
 		validationStatuses = new ArrayList<Integer>();
 		contextSimilarties = new ArrayList<Double>();
 		objectSimilarities = new ArrayList<Double>();
+//		hMap = new HashMap<Integer, Integer>();
+	}
+	
+	public void clear() {
+		for (int i = 0; i < sourceFeatureList.size(); i++) {
+			contextSimilarties.set(i, 1.0);
+			objectSimilarities.set(i, 1.0);
+			validationStatuses.set(i, UNDISCOVERED);
+		}
+//		hMap.clear();
 	}
 	
 	public void storeMatch(Feature sourceFeature, Feature targetFeature) {
@@ -37,6 +49,7 @@ public class MatchList {
 		validationStatuses.add(UNDISCOVERED);
 		contextSimilarties.add(1.0);
 		objectSimilarities.add(1.0);
+//		hMap.put(sourceFeature.getID(), UNDISCOVERED);
 	}
 	
 	public Feature getSourceFeatureByIndex(int i) {
@@ -51,7 +64,12 @@ public class MatchList {
 	 * @return the corresponding object in target layer 
 	 */
 	public Feature getMatchedTargetFeature(Feature sourceFeature) {
-		return targetFeatureList.get(sourceFeatureList.indexOf(sourceFeature));
+		int i = sourceFeatureList.indexOf(sourceFeature);
+		if (i == -1) {
+			return null;
+		} else {
+			return targetFeatureList.get(i);
+		}
 	}
 	/**
 	 * Return the Feature object of corresponding geographic object in source layer (according to the stored matches)
@@ -59,7 +77,12 @@ public class MatchList {
 	 * @return the corresponding object in source layer 
 	 */
 	public Feature getMatchedSourceFeature(Feature targetFeature) {
-		return sourceFeatureList.get(targetFeatureList.indexOf(targetFeature));
+		int i = targetFeatureList.indexOf(targetFeature);
+		if ( i == -1 ) {
+			return null;
+		} else {
+			return sourceFeatureList.get(i);
+		}
 	}
 	
 	
@@ -71,17 +94,44 @@ public class MatchList {
 		}
 	}
 	
-	
-	public void setAsInQueue(int index) {
-		validationStatuses.set(index, INQUEUE);
+	public boolean shouldBeQueued(Feature sourceFeature) {
+		int i = sourceFeatureList.indexOf(sourceFeature);
+		if (i == -1) {
+			System.out.println("This feature in not found in match records");
+			return false;
+		}
+//		if (!hMap.containsKey(sourceFeature.getID()) && hMap.get(sourceFeature.getID()) == UNDISCOVERED) {
+		if (validationStatuses.get(i) == UNDISCOVERED) {
+			System.out.println("index = " + i + ", should be queued");
+			return true;
+		} else {
+			System.out.println("index = " + i + ", no need to be queued");
+			return false;
+		}
 	}
 	
-	public void setAsInvalid(int index) {
-		validationStatuses.set(index, INVALID);
+	public void setAsInQueue(Feature sourceFeature) {
+//		hMap.put(sourceFeature.getID(), INQUEUE);
+		int i = sourceFeatureList.indexOf(sourceFeature);
+		if (i >= 0) {
+			validationStatuses.set(i, INQUEUE);
+		}
 	}
 	
-	public void setAsValid(int index) {
-		validationStatuses.set(index, VALID);
+	public void setAsInvalid(Feature sourceFeature) {
+//		hMap.put(sourceFeature.getID(), INVALID);
+		int i = sourceFeatureList.indexOf(sourceFeature);
+		if (i >= 0) {
+			validationStatuses.set(i, INVALID);
+		}
+	}
+	
+	public void setAsValid(Feature sourceFeature) {
+//		hMap.put(sourceFeature.getID(), VALID);
+		int i = sourceFeatureList.indexOf(sourceFeature);
+		if (i >= 0) {
+			validationStatuses.set(i, VALID);
+		}
 	}
 	
 	

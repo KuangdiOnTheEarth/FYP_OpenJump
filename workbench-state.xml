@@ -58,7 +58,7 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - VERTICAL_KEY</key>
-      <value class="java.lang.Integer">306</value>
+      <value class="java.lang.Integer">78</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.PROJECTS</key>

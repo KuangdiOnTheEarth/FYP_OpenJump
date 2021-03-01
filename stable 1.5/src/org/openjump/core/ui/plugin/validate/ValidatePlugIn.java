@@ -11,6 +11,7 @@ import org.openjump.core.ui.plugin.AbstractUiPlugIn;
 import org.openjump.core.ui.plugin.validate.pojo.AntiClockwiseSequence;
 import org.openjump.core.ui.plugin.validate.pojo.MatchList;
 import org.openjump.core.ui.plugin.validate.pojo.RelativePosition;
+import org.openjump.core.ui.plugin.validate.pojo.SupportingRelations;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -30,6 +31,8 @@ import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
 public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
+	
+	private final double validThreshold = 0.8; 
 	
 	private SharedSpace sharedSpace;
 	private MatchList matchList;
@@ -62,35 +65,100 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	@Override
 	public void run(TaskMonitor monitor, PlugInContext context) throws Exception {
 		this.matchList = sharedSpace.getMatchList();
+		matchList.clear();
 		System.gc();
+		System.out.println("\n------\nStart ValidationPlugIn ...\n------");
 		
-		Queue<Integer> queue = new LinkedList<Integer>(); // a queue storing the index of matches waiting to be validated
+		Queue<Feature> queue = new LinkedList<Feature>(); // a queue storing matches waiting to be validated
 		Random random = new  Random();
 		int numFeatures = matchList.numberOfFeatures();
 		if (numFeatures < 0) {
 			System.out.println(selfMark + "Feature numbers in MatchList are not aligned");
 			return;
 		}
-		int startingIndex = random.nextInt(numFeatures);
-		queue.offer(startingIndex);
-		matchList.setAsInQueue(startingIndex);
+		Feature startingFeature = matchList.getSourceFeatureByIndex(random.nextInt(numFeatures));
+		queue.offer(startingFeature);
+		matchList.setAsInQueue(startingFeature);
 		
 		final List<Feature> sourceFeatures = sharedSpace.getSourceLayer().getFeatureCollectionWrapper().getFeatures();
 		final List<Feature> targetFeatures = sharedSpace.getTargetLayer().getFeatureCollectionWrapper().getFeatures();
+		SupportingRelations supportingRelations = new SupportingRelations();
+		int matchCount = 0;
+		
+//		Queue<Feature> queueValidated = new LinkedList<Feature>();
 		
 		while (!queue.isEmpty()) {
-			// create a buffer surrounding the being checked feature
-			Feature sourceFeature = matchList.getSourceFeatureByIndex(queue.poll());
+			// get the object from the match being checked
+			Feature sourceFeature = queue.poll();
+//			queueValidated.add(sourceFeature);
+			matchCount++;
+			System.out.print("(" + matchCount + "/" + numFeatures + "):" + sourceFeature.getID() + " & " + matchList.getMatchedTargetFeature(sourceFeature).getID() + ": ");
+			// create a buffer of center object
+			Geometry sfGeom = sourceFeature.getGeometry();
+			Point sfCentroid =  sfGeom.getCentroid();
+			Geometry buffer = sfCentroid.buffer(bufferRadius);
 			
-			double contextSimilarity = calContextSimilarityFor(sourceFeature, sourceFeatures, targetFeatures, true, context);
+			System.out.println("Queue Length: " + queue.size());
+	        // create lists to contain the surrounding objects
+	        ArrayList<Feature> sourceSurr = new ArrayList<Feature>();	    
+			for (Feature f : sourceFeatures) {
+				if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
+					sourceSurr.add(f);
+					System.out.println("--");
+					if (matchList.shouldBeQueued(f)) {
+//					if (true) {
+						queue.add(f);
+						matchList.setAsInQueue(f);
+					}
+				}
+			}
+			// display the surrounding objects in a new layer
+//			showSurrObjectsInLayer(context, sourceFeature, buffer, sourceSurr);
+			
+			// record the dependency
+			System.out.println("Recording Surrouding Objects");
+			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr);
+			System.out.println("Adding undiscovered objects into queue...(" + sourceSurr.size() + ")");
+			// add surrounding features (matches) into queue
+//			for (Feature f : sourceSurr) {
+//				if (matchList.shouldBeQueued(f)) {
+//					System.out.print(f.getID() + " ");
+//					queue.offer(f);
+//					System.out.print("Setting as inQueue...");
+//					matchList.setAsInQueue(f);
+//					System.out.println("Done");
+//				} else {
+//					System.out.println("No need");
+//				}
+//			}
+
+			// calculate context similarity
+			System.out.println("Calculating context similarity...");
+			double contextSimilarity = calContextSimilarityFor(sourceFeature, sourceSurr);
+			System.out.println("Setting context similarity...");
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
+			// backtrack if the match is considered as invalid
+			if (contextSimilarity >= validThreshold) {
+				System.out.println("Setting as Valid...");
+				matchList.setAsValid(sourceFeature);
+			} else {
+				System.out.println("Setting as Invalid...");
+				matchList.setAsInvalid(sourceFeature);
+				backtrack(sourceFeature, supportingRelations);
+			}
 			
 			
-			// update the queue: add new matches into the queue and find the next match of being checked
 			
 			
-			System.out.println("\n");
 		}
+		
+		System.out.println("Validation Finished \n");
+
+	}
+	
+	
+	private void backtrack(Feature invalidFeature, SupportingRelations supportingRelations) {
+		System.out.println("--BackTrack: " + invalidFeature.getID() + "--");
 	}
 	
 	
@@ -100,35 +168,19 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	 * @param visible set as 'true' then the surrounding object will be visualized in a new layer
 	 * @return context similarity
 	 */
-	private double calContextSimilarityFor(Feature sourceFeature, List<Feature> sourceFeatures, List<Feature> targetFeatures, boolean visible, PlugInContext context) {
-		Geometry sfGeom = sourceFeature.getGeometry();
-		Point sfCentroid =  sfGeom.getCentroid();
-		Geometry buffer = sfCentroid.buffer(bufferRadius);
-		
-        // create lists to contain the surrounding objects
-        ArrayList<Feature> sourceSurr = new ArrayList<Feature>();	    
-        
-		for (Feature f : sourceFeatures) {
-			if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
-				sourceSurr.add(f);
-			}
+	private double calContextSimilarityFor(Feature sourceFeature, ArrayList<Feature> sourceSurr) {
+		if (sourceSurr.size() == 0) {
+			System.out.println("-- No surrounding object is detected --");
+			return 0.0;
 		}
-		
-		
 		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
 		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), matchList.getMatchedTargetFeature(sourceFeature));
-		
-		if (visible) {
-			showSurrObjectsInLayer(context, matchList.getMatchedTargetFeature(sourceFeature), buffer, sourceSurr);
-		}
-		
-		System.out.print("Context Similarity:" + sourceFeature.getID() + " & " + matchList.getMatchedTargetFeature(sourceFeature).getID() + ": ");
 		return compareOrderedFeatures(sourceSeq, targetSeq);
 	}
 	
 	
 	/**
-	 * Display the surrounding objects of a center objects (in target layer by default) in a new layer
+	 * Display the surrounding objects of a center objects in a new layer (by copying surrounding features from source layer)
 	 * @param context
 	 * @param centerFeature
 	 * @param buffer
@@ -168,7 +220,10 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	private ArrayList<Feature> findCorrespondingFeatures(ArrayList<Feature> sourceFeatures) {
 		ArrayList<Feature> targetFeatures = new ArrayList<Feature>();
 		for (Feature f : sourceFeatures) {
-			targetFeatures.add(matchList.getMatchedTargetFeature(f));
+			Feature targetF = matchList.getMatchedTargetFeature(f);
+			if (targetF != null) {
+				targetFeatures.add(targetF);
+			}
 		}
 		return targetFeatures;
 	}
