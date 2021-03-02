@@ -17,17 +17,21 @@ import javafx.util.Pair;
  */
 public class MatchList {
 	
-	private double bufferRadius = 0.5;
 	private double contextSimilarityWeight = 1;
 	
 	private ArrayList<Integer> sourceFeatureIDs = null;
 	private ArrayList<Integer> targetFeatureIDs = null;
+	
+	/**
+	 * The following feature lists only contain the matched features, not all the features in the source and target layers
+	 */
 	private ArrayList<Feature> sourceFeatureList = null; 
 	private ArrayList<Feature> targetFeatureList = null; 
 	private ArrayList<Double> contextSimilarties = null;
 	private ArrayList<Double> objectSimilarities = null;
 //	private HashMap<Integer, Integer> hMap = null;
-	
+	private ArrayList<Double> bufferRadiusList = null;
+
 	private ArrayList<Integer> validationStatuses = null;
 	private final int UNDISCOVERED = 0;
 	private final int INQUEUE      = 1;
@@ -43,6 +47,7 @@ public class MatchList {
 		validationStatuses = new ArrayList<Integer>();
 		contextSimilarties = new ArrayList<Double>();
 		objectSimilarities = new ArrayList<Double>();
+		bufferRadiusList = new ArrayList<Double>();
 //		hMap = new HashMap<Integer, Integer>();
 	}
 	
@@ -67,6 +72,7 @@ public class MatchList {
 		validationStatuses.add(UNDISCOVERED);
 		contextSimilarties.add(1.0);
 		objectSimilarities.add(1.0);
+		bufferRadiusList.add(0.0);
 //		hMap.put(sourceFeature.getID(), UNDISCOVERED);
 	}
 	
@@ -231,8 +237,18 @@ public class MatchList {
 		return new Pair<FeatureCollection, FeatureCollection>(validColl, invalidColl);
 	}
 	
+	public void setBufferRadius(Feature feature, double r) {
+		int i = sourceFeatureList.indexOf(feature);
+		if (i >= 0) {
+			bufferRadiusList.set(i, r);
+		}
+	}
 	
-	public double getBufferRadius() {
-		return this.bufferRadius;
+	public double getBufferRadius(Feature feature) {
+		int i = sourceFeatureList.indexOf(feature);
+		if (i == -1) {
+			return 0;		
+		}
+		return bufferRadiusList.get(i);
 	}
 }

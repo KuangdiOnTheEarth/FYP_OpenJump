@@ -102,7 +102,7 @@ public class CheckOneValidationPlugIn extends AbstractUiPlugIn implements Thread
 		}
 		Geometry sfGeom = sourceFeature.getGeometry();
 		Point sfCentroid =  sfGeom.getCentroid();
-		Geometry buffer = sfCentroid.buffer(matchList.getBufferRadius());
+		Geometry buffer = sfCentroid.buffer(matchList.getBufferRadius(sourceFeature));
 		
 		// create a feature collection to visualize surrounding features in a new layer 
 		FeatureCollection surrColl = null; // the feature collection of surrounding objects of a source layer feature

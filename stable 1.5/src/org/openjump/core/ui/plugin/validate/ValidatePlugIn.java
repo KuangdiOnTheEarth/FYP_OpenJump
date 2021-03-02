@@ -34,7 +34,9 @@ import javafx.util.Pair;
 
 public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
-	private final double validThreshold = 0.8; 
+	private final double VALID_THRESHOLD = 0.8; // if confidence level exceeds or equal to threshold, the match is considered as valid
+	private final int MIN_SURR_OBJ_NEEDED = 4; // the minimal number of surrounding objects needed
+	private final double BUFFER_INC_RATE = 1.1; // if too less surrounding object is found, the radius of buffer will increase at this rate
 	
 	private SharedSpace sharedSpace;
 	private MatchList matchList;
@@ -99,18 +101,28 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			// create a buffer of center object
 			Geometry sfGeom = sourceFeature.getGeometry();
 			Point sfCentroid =  sfGeom.getCentroid();
-			Geometry buffer = sfCentroid.buffer(bufferRadius);
-	        // create lists to contain the surrounding objects, add surrounding features (matches) into queue
-	        ArrayList<Feature> sourceSurr = new ArrayList<Feature>();	    
-			for (Feature f : sourceFeatures) {
-				if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
-					sourceSurr.add(f);
-					if (matchList.shouldBeQueued(f)) {
-						queue.add(f);
-						matchList.setAsInQueue(f);
+			ArrayList<Feature> sourceSurr = new ArrayList<Feature>();	
+			double radius = bufferRadius;
+			while (sourceSurr.size() < MIN_SURR_OBJ_NEEDED) {
+				sourceSurr.clear();
+				Geometry buffer = sfCentroid.buffer(radius);
+		        // create lists to contain the surrounding objects
+				for (Feature f : sourceFeatures) {
+					if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
+						sourceSurr.add(f);
 					}
 				}
+				radius = radius * BUFFER_INC_RATE;
 			}
+			matchList.setBufferRadius(sourceFeature, radius);
+			// add surrounding features (matches) into queue
+			for (Feature f : sourceSurr) {
+				if (matchList.shouldBeQueued(f)) {
+					queue.add(f);
+					matchList.setAsInQueue(f);
+				}
+			}
+			
 			// display the surrounding objects in a new layer
 //			showSurrObjectsInLayer(context, sourceFeature, buffer, sourceSurr);
 			
@@ -120,7 +132,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			double contextSimilarity = calContextSimilarityFor(sourceFeature, sourceSurr);
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
 			// backtrack if the match is considered as invalid
-			if (contextSimilarity >= validThreshold) {
+			if (contextSimilarity >= VALID_THRESHOLD) {
 				matchList.setAsValid(sourceFeature);
 			} else {
 				matchList.setAsInvalid(sourceFeature);
@@ -169,7 +181,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 					double preCL = matchList.getContextSimilarity(f); // confidence level
 					
 					matchList.setContextSimilarity(f, contextSimilarity);
-					if (matchList.getConfidenceLevel(f) < validThreshold) {
+					if (matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
 						System.out.println(String.format("\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
 						matchList.setAsInvalid(f);
 						nextLayerQueue.add(f);
@@ -208,7 +220,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	 */
 	private double calContextSimilarityFor(Feature sourceFeature, ArrayList<Feature> sourceSurr) {
 		if (sourceSurr.size() == 0) {
-			System.out.println("-- No surrounding object is detected --");
+//			System.out.println("--calContextSimilarityFor-- No surrounding object is detected for id = " + sourceFeature.getID());
 			return 0.0;
 		}
 		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
@@ -279,6 +291,10 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		
 		AntiClockwiseSequence sequence = new AntiClockwiseSequence();
 		for (Feature f : surrFeatures) {
+			if (f == center) { // sometimes the center feature also appears in surrounding feature list
+//				System.out.println("f == center " + center.getID() + " " + f.getID());
+				continue;
+			}
 			Point fCentroid = f.getGeometry().getCentroid();
 			Double fX = fCentroid.getX();
 			Double fY = fCentroid.getY();
@@ -287,6 +303,12 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			Double yDiff = fY - cY;
 			Double sin = yDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
 			Double cos = xDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
+			
+//			if (sin >= 0 || sin < 0 ) {
+//			} else {
+//				System.out.println("sin = " + yDiff + " / " + Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5) + "(c:" + center.getID() + "--" +f.getID());
+//			}
+			
 			RelativePosition p = new RelativePosition(f, sin, cos);
 			sequence.add(p);
 		}

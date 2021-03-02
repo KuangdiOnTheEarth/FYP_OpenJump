@@ -31,13 +31,13 @@ public class SupportingRelations {
 	
 	public void addSupportingRelation(Feature beSupportedFeature, ArrayList<Feature> ss) {
 		if (ss.isEmpty()) {
-			System.out.println("No supporting relation need to be recorded");
+//			System.out.println("No supporting relation need to be recorded for id = " + beSupportedFeature.getID());
 			return;
 		}
 		for (Feature f : ss) {
 			int index = features.indexOf(f);
 			if (index == -1) {
-				System.out.println("--SupportingRelations-- not found record of id = " + index);
+//				System.out.println("--SupportingRelations-- not found record of id = " + f.getID());
 			} else {
 				supports.get(index).add(f);
 			}
@@ -45,7 +45,7 @@ public class SupportingRelations {
 		
 		int index = features.indexOf(beSupportedFeature);
 		if (index == -1) {
-			System.out.println("--SupportingRelations-- the center feature is not found in record id = " + index);
+			System.out.println("--SupportingRelations-- the center feature is not found in record id = " + beSupportedFeature.getID());
 		}
 		beSupportedBy.set(index, ss);
 	}
