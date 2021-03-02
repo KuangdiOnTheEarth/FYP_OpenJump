@@ -29,6 +29,11 @@ public class SupportingRelations {
 	
 	
 	public ArrayList<Feature> getSupportingFeaturesOf(Feature f) {
-		return supportingFeatures.get(beSupportedFeatures.indexOf(f));
+		int index = beSupportedFeatures.indexOf(f);
+		if (index == -1) {
+			return null;
+		} else {
+			return supportingFeatures.get(index);
+		}
 	}
 }

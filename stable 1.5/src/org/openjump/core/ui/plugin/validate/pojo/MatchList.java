@@ -17,6 +17,10 @@ import javafx.util.Pair;
  */
 public class MatchList {
 	
+	private double bufferRadius = 0.5;
+	
+	private ArrayList<Integer> sourceFeatureIDs = null;
+	private ArrayList<Integer> targetFeatureIDs = null;
 	private ArrayList<Feature> sourceFeatureList = null; 
 	private ArrayList<Feature> targetFeatureList = null; 
 	private ArrayList<Double> contextSimilarties = null;
@@ -31,6 +35,8 @@ public class MatchList {
 	
 	
 	public MatchList() {
+		sourceFeatureIDs = new ArrayList<Integer>();
+		targetFeatureIDs = new ArrayList<Integer>();
 		sourceFeatureList = new ArrayList<Feature>();
 		targetFeatureList = new ArrayList<Feature>();
 		validationStatuses = new ArrayList<Integer>();
@@ -49,12 +55,30 @@ public class MatchList {
 	}
 	
 	public void storeMatch(Feature sourceFeature, Feature targetFeature) {
+		sourceFeatureIDs.add(sourceFeature.getID());
+		targetFeatureIDs.add(targetFeature.getID());
 		sourceFeatureList.add(sourceFeature);
 		targetFeatureList.add(targetFeature);
 		validationStatuses.add(UNDISCOVERED);
 		contextSimilarties.add(1.0);
 		objectSimilarities.add(1.0);
 //		hMap.put(sourceFeature.getID(), UNDISCOVERED);
+	}
+	
+	public Feature getSourceFeatureByID(int id) {
+		int index = sourceFeatureIDs.indexOf(id);
+		if (index == -1) {
+			return null;
+		}
+		return sourceFeatureList.get(index);
+	}
+	
+	public Feature getTargetFeatureByID(int id) {
+		int index = targetFeatureIDs.indexOf(id);
+		if (index == -1) {
+			return null;
+		}
+		return targetFeatureList.get(index);
 	}
 	
 	public Feature getSourceFeatureByIndex(int i) {
@@ -160,5 +184,10 @@ public class MatchList {
 			}
 		}
 		return new Pair<FeatureCollection, FeatureCollection>(validColl, invalidColl);
+	}
+	
+	
+	public double getBufferRadius() {
+		return this.bufferRadius;
 	}
 }

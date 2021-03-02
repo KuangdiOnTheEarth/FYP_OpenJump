@@ -127,11 +127,8 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 				backtrack(sourceFeature, supportingRelations);
 			}
 			
-			
-			
-			
 		}
-		
+		sharedSpace.storeSupportingRelations(supportingRelations);
 		showResult(context);
 		System.out.println("Validation Finished \n");
 

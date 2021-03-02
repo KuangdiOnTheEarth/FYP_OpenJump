@@ -1,6 +1,7 @@
 package org.openjump.core.ui.plugin.validate;
 
 import org.openjump.core.ui.plugin.validate.pojo.MatchList;
+import org.openjump.core.ui.plugin.validate.pojo.SupportingRelations;
 
 import com.vividsolutions.jump.workbench.model.Layer;
 
@@ -12,7 +13,7 @@ public class SharedSpace {
 	private Layer targetLayer = null;
 	
 	private MatchList matchList = null;
-	
+	private SupportingRelations supportingRelations = null;
 	
 	private SharedSpace() {}
 	
@@ -49,5 +50,13 @@ public class SharedSpace {
 	
 	public Layer getTargetLayer() {
 		return targetLayer;
+	}
+	
+	public void storeSupportingRelations(SupportingRelations sr) {
+		this.supportingRelations = sr;
+	}
+	
+	public SupportingRelations getSupportingRelations() {
+		return this.supportingRelations;
 	}
 }
