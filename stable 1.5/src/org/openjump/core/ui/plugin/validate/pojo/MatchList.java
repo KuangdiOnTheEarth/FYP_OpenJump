@@ -18,6 +18,7 @@ import javafx.util.Pair;
 public class MatchList {
 	
 	private double bufferRadius = 0.5;
+	private double contextSimilarityWeight = 1;
 	
 	private ArrayList<Integer> sourceFeatureIDs = null;
 	private ArrayList<Integer> targetFeatureIDs = null;
@@ -43,6 +44,10 @@ public class MatchList {
 		contextSimilarties = new ArrayList<Double>();
 		objectSimilarities = new ArrayList<Double>();
 //		hMap = new HashMap<Integer, Integer>();
+	}
+	
+	public ArrayList<Feature> getSourceList() {
+		return sourceFeatureList;
 	}
 	
 	public void clear() {
@@ -161,6 +166,16 @@ public class MatchList {
 		}
 	}
 	
+	public boolean isInvalid(Feature sourceFeature) {
+		int i = sourceFeatureList.indexOf(sourceFeature);
+		if (i >= 0) {
+			return validationStatuses.get(i) == INVALID;
+		} else {
+			System.out.println("--isInvalid-- Not found id = " + sourceFeature.getID());
+			return false;
+		}
+	}
+	
 	
 	public void setContextSimilarity(Feature srcFeature, Double similarity) {
 		contextSimilarties.set(sourceFeatureList.indexOf(srcFeature), similarity);
@@ -169,7 +184,37 @@ public class MatchList {
 		objectSimilarities.set(sourceFeatureList.indexOf(srcFeature), similarity);
 	}
 	
+	public double getContextSimilarity(Feature f) {
+		int i = sourceFeatureList.indexOf(f);
+		if (i >= 0) {
+			return contextSimilarties.get(i);
+		}
+		System.out.println("--getContextSimilarity-- Feature Not Found id = " + f.getID());
+		return 0;
+	}
 	
+	public double getObjectSimilarity(Feature f) {
+		int i = sourceFeatureList.indexOf(f);
+		if (i >= 0) {
+			return objectSimilarities.get(i);
+		}
+		System.out.println("--getObjectSimilarity-- Feature Not Found id = " + f.getID());
+		return 0;
+	}
+	
+	public double getConfidenceLevel(Feature f) {
+		int i = sourceFeatureList.indexOf(f);
+		if (i >= 0) {
+			return contextSimilarties.get(i) * contextSimilarityWeight + objectSimilarities.get(i) * (1 - contextSimilarityWeight);
+		}
+		System.out.println("--getConfidenceLevel-- Feature Not Found id = " + f.getID());
+		return 0;
+	}
+	
+	/**
+	 * 
+	 * @return a set of all VALID matches and a set of all INVALID matches
+	 */
 	public Pair<FeatureCollection, FeatureCollection> getValidationResult() {
 		FeatureCollection validColl = null;
 		FeatureCollection invalidColl = null;

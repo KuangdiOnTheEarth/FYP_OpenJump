@@ -38,6 +38,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
 	private SharedSpace sharedSpace;
 	private MatchList matchList;
+	private SupportingRelations supportingRelations;
 	
 	private final double bufferRadius = 0.5;
 	
@@ -84,7 +85,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		
 		final List<Feature> sourceFeatures = sharedSpace.getSourceLayer().getFeatureCollectionWrapper().getFeatures();
 		final List<Feature> targetFeatures = sharedSpace.getTargetLayer().getFeatureCollectionWrapper().getFeatures();
-		SupportingRelations supportingRelations = new SupportingRelations();
+		supportingRelations = new SupportingRelations();
 		int matchCount = 0;
 		
 //		Queue<Feature> queueValidated = new LinkedList<Feature>();
@@ -94,7 +95,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			Feature sourceFeature = queue.poll();
 //			queueValidated.add(sourceFeature);
 			matchCount++;
-			System.out.print("(" + matchCount + "/" + numFeatures + "):" + sourceFeature.getID() + " & " + matchList.getMatchedTargetFeature(sourceFeature).getID() + ": ");
+//			System.out.print("(" + matchCount + "/" + numFeatures + "):" + sourceFeature.getID() + " & " + matchList.getMatchedTargetFeature(sourceFeature).getID() + ": ");
 			// create a buffer of center object
 			Geometry sfGeom = sourceFeature.getGeometry();
 			Point sfCentroid =  sfGeom.getCentroid();
@@ -115,7 +116,6 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			
 			// record the dependency
 			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr);
-
 			// calculate context similarity
 			double contextSimilarity = calContextSimilarityFor(sourceFeature, sourceSurr);
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
@@ -124,7 +124,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 				matchList.setAsValid(sourceFeature);
 			} else {
 				matchList.setAsInvalid(sourceFeature);
-				backtrack(sourceFeature, supportingRelations);
+				backtrack(sourceFeature);
 			}
 			
 		}
@@ -135,8 +135,61 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	}
 	
 	
-	private void backtrack(Feature invalidFeature, SupportingRelations supportingRelations) {
-		System.out.println("--BackTrack: " + invalidFeature.getID() + "--");
+	private void backtrack(Feature invalidFeature) {
+		System.out.println("\t--BackTrack: " + invalidFeature.getID() + "--");
+		if (true) {
+			return;
+		}
+		Queue<Feature> currentLayerQueue = new LinkedList<Feature>();
+		currentLayerQueue.offer(invalidFeature);
+		int layerCount = 0;
+		
+		ArrayList<Feature> previousLayerFeatures = new ArrayList<Feature>();// the features have been updated once, no need to be changed again
+		
+		while (!currentLayerQueue.isEmpty()) {
+			System.out.println("\tbackrtack layer " + layerCount);
+			layerCount++;
+			Queue<Feature> nextLayerQueue = new LinkedList<Feature>();
+			while (!currentLayerQueue.isEmpty()) {
+				Feature cFeature = currentLayerQueue.poll();
+				// get the matches the invalid match supports / influenced by the invalid match
+				ArrayList<Feature> supports = supportingRelations.getFeaturesSupportedBy(cFeature);
+				if (supports == null) {
+					System.out.println("No supporting match found for id = " + cFeature.getID());
+					return;
+				}
+				// recalculate the context similarity for the features which use the current invalid feature as supporting match
+				for (Feature f : supports) {
+					if (previousLayerFeatures.contains(f) || currentLayerQueue.contains(f)) { // do not consider the previous and same layer newly invalid features
+						continue;
+					}
+					double contextSimilarity = recalContextSimilarity(f, cFeature);
+					double preCS = matchList.getContextSimilarity(f); // context similarity
+					double preOS = matchList.getObjectSimilarity(f); // object similarity
+					double preCL = matchList.getContextSimilarity(f); // confidence level
+					
+					matchList.setContextSimilarity(f, contextSimilarity);
+					if (matchList.getConfidenceLevel(f) < validThreshold) {
+						System.out.println(String.format("\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
+						matchList.setAsInvalid(f);
+						nextLayerQueue.add(f);
+					}
+				}
+			}
+			currentLayerQueue = nextLayerQueue;
+		}
+	}
+	
+	private double recalContextSimilarity(Feature feature, Feature newinvalidFeature) {
+		// get the matches used to support the being recalculated match
+		ArrayList<Feature> supports = supportingRelations.getSupportingFeaturesOf(feature);
+		
+		AntiClockwiseSequence sourceSequence = orderFeaturesClockwise(supports, feature);
+		AntiClockwiseSequence targetSequence = orderFeaturesClockwise(findCorrespondingFeatures(supports), matchList.getMatchedTargetFeature(feature));
+		
+		double contextSimilarity = sourceSequence.recalContextSimilarityWith(targetSequence, newinvalidFeature);
+		
+		return contextSimilarity;
 	}
 	
 	

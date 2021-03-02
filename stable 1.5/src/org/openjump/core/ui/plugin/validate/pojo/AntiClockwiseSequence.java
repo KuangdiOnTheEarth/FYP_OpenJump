@@ -55,27 +55,6 @@ public class AntiClockwiseSequence {
 	
 	
 	public Double calContextSimilarityWith(AntiClockwiseSequence target) {
-		
-//		System.out.print("Source Surrounding: ");
-//		for (Feature f : this.getFeatureList()) {
-//			System.out.print(f.getID() + " ");
-//		}
-
-//		System.out.print("\nTarget Surrounding: ");
-//		for (Feature f : target.getFeatureList()) {
-//			System.out.print(f.getID() + " ");
-//		}
-//		System.out.print("\n sin: ");
-//		for (RelativePosition rp : target.sequence) {
-//			System.out.print(String.format("%.4f ", rp.sin()));
-//		}
-//		System.out.print("\n cos: ");
-//		for (RelativePosition rp : target.sequence) {
-//			System.out.print(String.format("%.4f ", rp.cos()));
-//		}
-//		System.out.println();
-		
-		
 		double smallerLength = Math.min(this.size(), target.size());
 		
 		ArrayList<Feature> tarFeatures = target.getFeatureList();
@@ -96,7 +75,6 @@ public class AntiClockwiseSequence {
 		if (corrIndices.size() == 0) {
 			return 0.0;
 		}
-		
 		
 		// find the max in-order numbers in corrIndices
 		double maxInOrder = 1;
@@ -123,12 +101,94 @@ public class AntiClockwiseSequence {
 			}
 		}
 		
-		System.out.print(String.format(("(%d/%d, %.3f): "), (int)maxInOrder, (int)smallerLength, (maxInOrder/smallerLength)));
-		for (Feature f : target.getFeatureList()) {
-			System.out.print(f.getID() + " ");
-		}
-		System.out.println();
+//		System.out.print(String.format(("(%d/%d, %.3f): "), (int)maxInOrder, (int)smallerLength, (maxInOrder/smallerLength)));
+//		for (Feature f : target.getFeatureList()) {
+//			System.out.print(f.getID() + " ");
+//		}
+//		System.out.println();
 		
 		return maxInOrder / smallerLength;
+	}
+	
+	public double recalContextSimilarityWith(AntiClockwiseSequence tarSequence, Feature newInvalidFeature) {
+		double smallerLength = Math.min(this.size(), tarSequence.size());
+		
+		ArrayList<Feature> tarFeatures = tarSequence.getFeatureList();
+		// if a feature in source sequence (this) has matched feature in target layer sequence, the index of the target sequence will be recorded
+		ArrayList<Integer> corrTarIndices = new ArrayList<Integer>(); 
+		ArrayList<Feature> matchedSourFeatures = new ArrayList<Feature>();
+		
+		MatchList matchList = sharedSpace.getMatchList();
+		// remove the single objects from source feature sequence
+		for (Feature sf : this.getFeatureList()) {
+			for (int i = 0; i < tarFeatures.size() ; i++) {
+				if (matchList.getMatchedTargetFeature(sf) == tarFeatures.get(i)) {
+					corrTarIndices.add(i);
+					matchedSourFeatures.add(sf);
+					break;
+				}
+			}
+		}
+		if (corrTarIndices.size() == 0) {
+			return 0.0;
+		}
+		
+		// find the max in-order numbers in corrIndices, record them in ArrayList
+		ArrayList<Feature> maxInorderSurr = null;
+		// the corresponding not in-ordered surrounding matches 
+		ArrayList<Feature> notInorderSurr = null;
+		
+		double maxInOrder = 1;
+		int startIndex = 0;
+		while (startIndex + maxInOrder < corrTarIndices.size()) {
+			ArrayList<Feature> tempInorderSurr = new ArrayList<Feature>();
+			ArrayList<Feature> tempNotInorderSurr = new ArrayList<Feature>();
+			int nextStartIndex = -1;
+			int count = 1;
+			int temp = corrTarIndices.get(startIndex);
+			for (int i = 1; i + startIndex < corrTarIndices.size(); i++) {
+				if (corrTarIndices.get(startIndex + i) > temp) {
+					temp = corrTarIndices.get(startIndex + i);
+					tempInorderSurr.add(matchedSourFeatures.get(i));
+					count++;
+				} else {
+					tempNotInorderSurr.add(matchedSourFeatures.get(i));
+					if (nextStartIndex == -1) {
+						nextStartIndex = startIndex + i;
+					}
+				}
+			}
+			if (count > maxInOrder) {
+				maxInOrder = count;
+				maxInorderSurr = tempInorderSurr;
+			}
+			if (startIndex < nextStartIndex) {
+				startIndex = nextStartIndex;
+			} else { // all possibilities have been checked
+				break;
+			}
+		}
+		
+		double total = maxInOrder;
+//		for (Feature f : maxInorderSurr) {
+//			if (matchList.isInvalid(f)) {
+//				total += matchList.getConfidenceLevel(f);
+//			} else {
+//				total += 1;
+//			}
+//		}
+		if (maxInorderSurr.contains(newInvalidFeature)) {
+			total = total - 1 + matchList.getConfidenceLevel(newInvalidFeature);
+		}
+		
+		double contextSimilarity = total / smallerLength;
+
+//		System.out.print(String.format(("(%d/%d, %.3f): "), (int)maxInOrder, (int)smallerLength, contextSimilarity));
+//		for (Feature f : target.getFeatureList()) {
+//			System.out.print(f.getID() + " ");
+//		}
+//		System.out.println();
+		
+		return contextSimilarity;
 	}
 }
