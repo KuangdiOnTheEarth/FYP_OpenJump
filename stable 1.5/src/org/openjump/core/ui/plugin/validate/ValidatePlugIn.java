@@ -103,9 +103,11 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			Point sfCentroid =  sfGeom.getCentroid();
 			ArrayList<Feature> sourceSurr = new ArrayList<Feature>();	
 			double radius = bufferRadius;
+			Geometry buffer = sfCentroid.buffer(radius);
 			while (sourceSurr.size() < MIN_SURR_OBJ_NEEDED) {
 				sourceSurr.clear();
-				Geometry buffer = sfCentroid.buffer(radius);
+				buffer = sfCentroid.buffer(radius);
+//				Geometry buffer = sfCentroid.buffer(radius);
 		        // create lists to contain the surrounding objects
 				for (Feature f : sourceFeatures) {
 					if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
@@ -148,43 +150,52 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
 	
 	private void backtrack(Feature invalidFeature) {
-		System.out.println("\t--BackTrack: " + invalidFeature.getID() + "--");
-		if (true) {
-			return;
-		}
+		System.out.println("--BackTrack: " + invalidFeature.getID() + "--");
+//		if (true) {
+//			return;
+//		}
 		Queue<Feature> currentLayerQueue = new LinkedList<Feature>();
 		currentLayerQueue.offer(invalidFeature);
 		int layerCount = 0;
 		
-		ArrayList<Feature> previousLayerFeatures = new ArrayList<Feature>();// the features have been updated once, no need to be changed again
+		ArrayList<Feature> previousLayerFeatures = new ArrayList<Feature>();// the features have been recalculated in this backtrack, no need to be changed again
 		
 		while (!currentLayerQueue.isEmpty()) {
-			System.out.println("\tbackrtack layer " + layerCount);
+			System.out.println("layer " + layerCount);
 			layerCount++;
 			Queue<Feature> nextLayerQueue = new LinkedList<Feature>();
+			
+			// the following loop go through the recalculation of one layer
 			while (!currentLayerQueue.isEmpty()) {
 				Feature cFeature = currentLayerQueue.poll();
+				previousLayerFeatures.add(cFeature);
+				System.out.println("\tChecking the matches " + cFeature.getID() + " supports");
 				// get the matches the invalid match supports / influenced by the invalid match
 				ArrayList<Feature> supports = supportingRelations.getFeaturesSupportedBy(cFeature);
 				if (supports == null) {
 					System.out.println("No supporting match found for id = " + cFeature.getID());
-					return;
-				}
-				// recalculate the context similarity for the features which use the current invalid feature as supporting match
-				for (Feature f : supports) {
-					if (previousLayerFeatures.contains(f) || currentLayerQueue.contains(f)) { // do not consider the previous and same layer newly invalid features
-						continue;
-					}
-					double contextSimilarity = recalContextSimilarity(f, cFeature);
-					double preCS = matchList.getContextSimilarity(f); // context similarity
-					double preOS = matchList.getObjectSimilarity(f); // object similarity
-					double preCL = matchList.getContextSimilarity(f); // confidence level
-					
-					matchList.setContextSimilarity(f, contextSimilarity);
-					if (matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
-						System.out.println(String.format("\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
-						matchList.setAsInvalid(f);
-						nextLayerQueue.add(f);
+				} else {
+					// recalculate the context similarity for the features which use the current invalid feature as supporting match
+					for (Feature f : supports) {
+						if (matchList.isInvalid(f)) { // not recalculate the already invalid matches
+							continue;
+						}
+						if (previousLayerFeatures.contains(f) || currentLayerQueue.contains(f) || nextLayerQueue.contains(f)) {
+							// in previous layers              | not influence same layer       | has already marked as invalid in next layer
+							continue;
+						}
+						double preCS = matchList.getContextSimilarity(f); // context similarity
+						double preOS = matchList.getObjectSimilarity(f); // object similarity
+						double preCL = matchList.getContextSimilarity(f); // confidence level
+						double contextSimilarity = recalContextSimilarity(f, cFeature);
+						matchList.setContextSimilarity(f, contextSimilarity);
+						if (matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
+							System.out.println(String.format("\t\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;%.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
+							matchList.setAsInvalid(f);
+							nextLayerQueue.add(f);
+						} else {
+							System.out.println(String.format("\t\t%d: %.4f --> %.4f", f.getID(), preCS, matchList.getContextSimilarity(f)));
+						}
 					}
 				}
 			}
@@ -199,7 +210,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		AntiClockwiseSequence sourceSequence = orderFeaturesClockwise(supports, feature);
 		AntiClockwiseSequence targetSequence = orderFeaturesClockwise(findCorrespondingFeatures(supports), matchList.getMatchedTargetFeature(feature));
 		
-		double contextSimilarity = sourceSequence.recalContextSimilarityWith(targetSequence, newinvalidFeature);
+		double contextSimilarity = sourceSequence.calContextSimilarityWith(targetSequence, true);
 		
 		return contextSimilarity;
 	}
@@ -323,7 +334,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	 * @return
 	 */
 	private double compareOrderedFeatures(AntiClockwiseSequence fs1, AntiClockwiseSequence fs2) {
-		return fs1.calContextSimilarityWith(fs2);
+		return fs1.calContextSimilarityWith(fs2, false);
 	}
 	
 }

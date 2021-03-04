@@ -133,7 +133,7 @@ public class CheckOneValidationPlugIn extends AbstractUiPlugIn implements Thread
 		
 		System.out.print("Context Similarity:" + sourceFeature.getID() + " & " + matchList.getMatchedTargetFeature(sourceFeature).getID() + ": ");
 		double contextSimilarity = compareOrderedFeatures(sourceSeq, targetSeq);
-		matchList.setContextSimilarity(sourceFeature, contextSimilarity);
+//		matchList.setContextSimilarity(sourceFeature, contextSimilarity);
 		
 		System.out.println("\n");
 	    
@@ -160,14 +160,16 @@ public class CheckOneValidationPlugIn extends AbstractUiPlugIn implements Thread
 	 * @return
 	 */
 	private AntiClockwiseSequence orderFeaturesClockwise(ArrayList<Feature> surrFeatures, Feature center) {
-//		System.out.println("Number of surrounding objects: " + surrFeatures.size());
 		Point centerCentroid = center.getGeometry().getCentroid();
 		Double cX = centerCentroid.getX(); 
 		Double cY = centerCentroid.getY();
 		
 		AntiClockwiseSequence sequence = new AntiClockwiseSequence();
 		for (Feature f : surrFeatures) {
-//			System.out.println("Calculating RelativePosition of " + f.getID());
+			if (f == center) { // sometimes the center feature also appears in surrounding feature list
+				System.out.println("f == center " + center.getID() + " " + f.getID());
+				continue;
+			}
 			Point fCentroid = f.getGeometry().getCentroid();
 			Double fX = fCentroid.getX();
 			Double fY = fCentroid.getY();
@@ -176,12 +178,15 @@ public class CheckOneValidationPlugIn extends AbstractUiPlugIn implements Thread
 			Double yDiff = fY - cY;
 			Double sin = yDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
 			Double cos = xDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
-//			System.out.println(String.format("%d: xDiff: %.4f; yDiff: %.4f; line: %.4f; sin: %.4f; cos: %.4f", f.getID(), xDiff, yDiff, Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5), sin, cos));
+//			System.out.println(String.format("xDiff = %.4f; yDiff = %.4f", xDiff, yDiff));
+			if (sin >= 0 || sin < 0 ) {
+			} else {
+				System.out.println("sin = " + yDiff + " / " + Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5) + "(c:" + center.getID() + "--" +f.getID());
+			}
+			
 			RelativePosition p = new RelativePosition(f, sin, cos);
 			sequence.add(p);
-//			System.out.println("Calculated RelativePosition of " + f.getID());
 		}
-		
 		return sequence;
 	}
 	
@@ -193,7 +198,7 @@ public class CheckOneValidationPlugIn extends AbstractUiPlugIn implements Thread
 	 * @return
 	 */
 	private double compareOrderedFeatures(AntiClockwiseSequence fs1, AntiClockwiseSequence fs2) {
-		return fs1.calContextSimilarityWith(fs2);
+		return fs1.calContextSimilarityWith(fs2, true);
 	}
 
 }

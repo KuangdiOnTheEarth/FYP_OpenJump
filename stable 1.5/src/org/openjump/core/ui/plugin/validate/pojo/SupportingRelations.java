@@ -39,7 +39,7 @@ public class SupportingRelations {
 			if (index == -1) {
 //				System.out.println("--SupportingRelations-- not found record of id = " + f.getID());
 			} else {
-				supports.get(index).add(f);
+				supports.get(index).add(beSupportedFeature);
 			}
 		}
 		

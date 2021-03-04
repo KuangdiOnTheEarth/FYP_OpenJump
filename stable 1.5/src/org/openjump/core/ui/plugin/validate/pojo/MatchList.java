@@ -17,7 +17,7 @@ import javafx.util.Pair;
  */
 public class MatchList {
 	
-	private double contextSimilarityWeight = 1;
+	private final double CONTEXT_SIMILARITY_WEIGHT = 1;
 	
 	private ArrayList<Integer> sourceFeatureIDs = null;
 	private ArrayList<Integer> targetFeatureIDs = null;
@@ -71,7 +71,7 @@ public class MatchList {
 		targetFeatureList.add(targetFeature);
 		validationStatuses.add(UNDISCOVERED);
 		contextSimilarties.add(1.0);
-		objectSimilarities.add(1.0);
+		objectSimilarities.add(0.0); // object similarity will be considered only if context similarity lower than threshold, so it is initiated to 0
 		bufferRadiusList.add(0.0);
 //		hMap.put(sourceFeature.getID(), UNDISCOVERED);
 	}
@@ -177,17 +177,27 @@ public class MatchList {
 		if (i >= 0) {
 			return validationStatuses.get(i) == INVALID;
 		} else {
-			System.out.println("--isInvalid-- Not found id = " + sourceFeature.getID());
+//			System.out.println("--isInvalid-- Not found id = " + sourceFeature.getID());
 			return false;
 		}
 	}
 	
 	
 	public void setContextSimilarity(Feature srcFeature, Double similarity) {
-		contextSimilarties.set(sourceFeatureList.indexOf(srcFeature), similarity);
+		int i = sourceFeatureList.indexOf(srcFeature);
+		if (i == -1) {
+			System.out.println("--setContextSimilarity-- feature not found id = " + srcFeature.getID());
+			return;
+		}
+		contextSimilarties.set(i, similarity);
 	}
 	public void setObjectSimilarity(Feature srcFeature, Double similarity) {
-		objectSimilarities.set(sourceFeatureList.indexOf(srcFeature), similarity);
+		int i = sourceFeatureList.indexOf(srcFeature);
+		if (i == -1) {
+			System.out.println("--setObjectSimilarity-- feature not found id = " + srcFeature.getID());
+			return;
+		}
+		objectSimilarities.set(i, similarity);
 	}
 	
 	public double getContextSimilarity(Feature f) {
@@ -211,7 +221,7 @@ public class MatchList {
 	public double getConfidenceLevel(Feature f) {
 		int i = sourceFeatureList.indexOf(f);
 		if (i >= 0) {
-			return contextSimilarties.get(i) * contextSimilarityWeight + objectSimilarities.get(i) * (1 - contextSimilarityWeight);
+			return contextSimilarties.get(i) * CONTEXT_SIMILARITY_WEIGHT + objectSimilarities.get(i) * (1 - CONTEXT_SIMILARITY_WEIGHT);
 		}
 		System.out.println("--getConfidenceLevel-- Feature Not Found id = " + f.getID());
 		return 0;
