@@ -13,7 +13,7 @@ import com.vividsolutions.jump.feature.Feature;
 
 public class RouteContextCalculator extends AbstractContextCalculator{
 	
-	public double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> sourceSurr, boolean isBackTrack) {
+	public double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> sourceSurr, boolean visualize) {
 		// if equals null, use the recorded surrounding object set
 		if (sourceSurr == null) {
 			sourceSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
@@ -23,23 +23,7 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 		}
 		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
 		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), matchList.getMatchedTargetFeature(sourceFeature));
-		return sourceSeq.calContextSimilarityWith(targetSeq, isBackTrack);
-	}
-	
-	/**
-	 * find the corresponding features (objects in target layer) of the surrounding objects of the being checked object in source layer
-	 * @param sourceFeatures
-	 * @return
-	 */
-	private ArrayList<Feature> findCorrespondingFeatures(ArrayList<Feature> sourceFeatures) {
-		ArrayList<Feature> targetFeatures = new ArrayList<Feature>();
-		for (Feature f : sourceFeatures) {
-			Feature targetF = matchList.getMatchedTargetFeature(f);
-			if (targetF != null) {
-				targetFeatures.add(targetF);
-			}
-		}
-		return targetFeatures;
+		return sourceSeq.calContextSimilarityWith(targetSeq, visualize);
 	}
 	
 	/**
@@ -79,5 +63,20 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 		return sequence;
 	}
 	
+	/**
+	 * find the corresponding features (objects in target layer) of the surrounding objects of the being checked object in source layer
+	 * @param sourceFeatures
+	 * @return
+	 */
+	protected ArrayList<Feature> findCorrespondingFeatures(ArrayList<Feature> sourceFeatures) {
+		ArrayList<Feature> targetFeatures = new ArrayList<Feature>();
+		for (Feature f : sourceFeatures) {
+			Feature targetF = matchList.getMatchedTargetFeature(f);
+			if (targetF != null) {
+				targetFeatures.add(targetF);
+			}
+		}
+		return targetFeatures;
+	}
 	
 }

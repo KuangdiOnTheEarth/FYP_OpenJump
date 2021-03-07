@@ -9,6 +9,7 @@ import java.util.Random;
 import org.openjump.core.ui.plugin.AbstractUiPlugIn;
 import org.openjump.core.ui.plugin.validate.contextcalculator.AbstractContextCalculator;
 import org.openjump.core.ui.plugin.validate.contextcalculator.RouteContextCalculator;
+import org.openjump.core.ui.plugin.validate.contextcalculator.StarContextCalculator;
 import org.openjump.core.ui.plugin.validate.pojo.AntiClockwiseSequence;
 import org.openjump.core.ui.plugin.validate.pojo.MatchList;
 import org.openjump.core.ui.plugin.validate.pojo.SupportingRelations;
@@ -33,7 +34,7 @@ import javafx.util.Pair;
 public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
 	private final double VALID_THRESHOLD = 0.8; // if confidence level exceeds or equal to threshold, the match is considered as valid
-	private final int MIN_SURR_OBJ_NEEDED = 4; // the minimal number of surrounding objects needed
+	private final int MIN_SURR_OBJ_NEEDED = 5; // the minimal number of surrounding objects needed
 	private final double BUFFER_INC_RATE = 1.1; // if too less surrounding object is found, the radius of buffer will increase at this rate
 	
 	private SharedSpace sharedSpace;
@@ -68,7 +69,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 
 	@Override
 	public void run(TaskMonitor monitor, PlugInContext context) throws Exception {
-		contextSimilarityCalculator = new RouteContextCalculator();
+		contextSimilarityCalculator = new StarContextCalculator(20);
 		this.matchList = sharedSpace.getMatchList();
 		matchList.clear();
 		System.gc();
