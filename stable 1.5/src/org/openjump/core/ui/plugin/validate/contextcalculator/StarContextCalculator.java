@@ -18,19 +18,26 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		this.degreeRange = degreeSectionRange;
 	}
 	
-	public double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> sourceSurr, boolean visualize) {
-		if (sourceSurr == null) {
-			sourceSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
+	public double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr, boolean visualize) {
+		if (srcSurr == null) {
+			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
 		}
-		if (sourceSurr.size() == 0) {
+		if (srcSurr.size() == 0) {
 			return 0.0;
 		}
-		for (int i = 0; i < sourceSurr.size(); i++) { // sometimes the center feature may also appears in surrounding feature list, then remove it
-			if (sourceSurr.get(i) == sourceFeature) {
-				sourceSurr.remove(i);
-				break;
+		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
+		for (Feature f : srcSurr) {
+			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
+				sourceSurr.add(f);
 			}
 		}
+		
+//		for (int i = 0; i < sourceSurr.size(); i++) { // sometimes the center feature may also appears in surrounding feature list, then remove it
+//			if (sourceSurr.get(i) == sourceFeature) {
+//				sourceSurr.remove(i);
+//				break;
+//			}
+//		}
 		ArrayList<Feature> targetSurr = findCorrespondingFeatures(sourceSurr); // may exists null features
 		
 		int numSurroundingObjects = sourceSurr.size();
@@ -53,29 +60,127 @@ public class StarContextCalculator extends AbstractContextCalculator{
 //			if (getSectionIndex(sourceDegrees.get(i)) == getSectionIndex(targetDegrees.get(i))) {
 //				sameSectionCount++;
 //			}
-			if (Math.abs(sourceDegrees.get(i) - targetDegrees.get(i)) <= degreeRange) {
+			double degreeDiff = Math.abs(sourceDegrees.get(i) - targetDegrees.get(i));
+			if (degreeDiff > 180) {
+				degreeDiff = 360 - degreeDiff;
+			}
+			if (degreeDiff <= degreeRange) {
 				sameSectionCount++;
 			}
 		}
 		
 		double res = (double)sameSectionCount / (double)numSurroundingObjects;
-		if (res < 0.8) {
-			System.out.println(sourceFeature.getID() + ": ");
-			System.out.print("source: ");
-			for (int i = 0; i < sourceDegrees.size(); i++) {
-				System.out.print(sourceMatchedFeatures.get(i).getID() + " ");
-			}
-			System.out.print("\nsource: ");
-			for (int i = 0; i < sourceDegrees.size(); i++) {
-				System.out.print(String.format("%.4f ", sourceDegrees.get(i)));
-			}
-			System.out.print("\ntarget: ");
-			for (int i = 0; i < targetDegrees.size(); i++) {
-				System.out.print(String.format("%.4f ", targetDegrees.get(i)));
-			}
-			System.out.println("\n(" + sameSectionCount + " / " + numSurroundingObjects + ") = " + res);
-			System.out.println();
+		return res;
+	}
+	
+	
+	public double checkContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr) {
+		if (srcSurr == null) {
+			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
 		}
+		if (srcSurr.size() == 0) {
+			return 0.0;
+		}
+		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
+		for (Feature f : srcSurr) {
+			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
+				sourceSurr.add(f);
+			}
+		}
+		
+//		for (int i = 0; i < sourceSurr.size(); i++) { // sometimes the center feature may also appears in surrounding feature list, then remove it
+//			if (sourceSurr.get(i) == sourceFeature) {
+//				sourceSurr.remove(i);
+//				break;
+//			}
+//		}
+		ArrayList<Feature> targetSurr = findCorrespondingFeatures(sourceSurr); // may exists null features
+		
+		int numSurroundingObjects = sourceSurr.size();
+		
+		// get the list of all matched surrounding objects, remove all the null features in source and target surr lists
+		ArrayList<Feature> sourceMatchedFeatures = new ArrayList<Feature>();
+		ArrayList<Feature> targetMatchedFeatures = new ArrayList<Feature>();
+		
+		ArrayList<Feature> sourceUnMatchedFeatures = new ArrayList<Feature>();
+		ArrayList<Feature> targetUnMatchedFeatures = new ArrayList<Feature>();
+		for (int i = 0; i < numSurroundingObjects; i++) {
+			if (sourceSurr.get(i) != null && targetSurr.get(i) != null) {
+				sourceMatchedFeatures.add(sourceSurr.get(i));
+				targetMatchedFeatures.add(targetSurr.get(i));
+			} else if (sourceSurr.get(i) == null) {
+				targetUnMatchedFeatures.add(targetSurr.get(i));
+			} else if (targetSurr.get(i) == null) {
+				sourceUnMatchedFeatures.add(sourceSurr.get(i));
+			}
+		}
+		
+		ArrayList<Double> sourceDegrees = getDegreeList(sourceMatchedFeatures, sourceFeature);
+		ArrayList<Double> targetDegrees = getDegreeList(targetMatchedFeatures, matchList.getMatchedTargetFeature(sourceFeature));
+		ArrayList<Feature> invalidSourceFeatures = new ArrayList<Feature>();
+		ArrayList<Feature> invalidTargetFeatures = new ArrayList<Feature>();
+		ArrayList<Integer> invalidFeatureIndices = new ArrayList<Integer>();
+		
+		int sameSectionCount = 0;
+		for (int i = 0; i < sourceDegrees.size(); i++) {
+//			if (getSectionIndex(sourceDegrees.get(i)) == getSectionIndex(targetDegrees.get(i))) {
+//				sameSectionCount++;
+//			}
+			double degreeDiff = Math.abs(sourceDegrees.get(i) - targetDegrees.get(i));
+			if (degreeDiff > 180) {
+				degreeDiff = 360 - degreeDiff;
+			}
+			if (degreeDiff <= degreeRange) {
+				sameSectionCount++;
+			} else {
+				invalidSourceFeatures.add(sourceMatchedFeatures.get(i));
+				invalidTargetFeatures.add(targetMatchedFeatures.get(i));
+				invalidFeatureIndices.add(i);
+			}
+		}
+		
+		double res = (double)sameSectionCount / (double)numSurroundingObjects;
+		
+		System.out.println("Context Similarity: " + String.format("%.4f (%d/%d)", res, sameSectionCount, numSurroundingObjects));
+		
+		// print degree list
+		System.out.println(sourceFeature.getID() + ": ");
+		System.out.print("source: ");
+		for (int i = 0; i < sourceDegrees.size(); i++) {
+			System.out.print(sourceMatchedFeatures.get(i).getID() + " ");
+		}
+		System.out.print("\nsource: ");
+		for (int i = 0; i < sourceDegrees.size(); i++) {
+			System.out.print(String.format("%.4f ", sourceDegrees.get(i)));
+		}
+		System.out.print("\ntarget: ");
+		for (int i = 0; i < targetDegrees.size(); i++) {
+			System.out.print(String.format("%.4f ", targetDegrees.get(i)));
+		}
+		System.out.println("\n(" + sameSectionCount + " / " + numSurroundingObjects + ") = " + res);
+
+		// print invalid supporting matches
+		if (invalidSourceFeatures.size() > 0) {
+			System.out.println("A match with degree difference smaller than " + sharedSpace.STAR_DEGREE_RANGE + " is considered as valid supporting match");
+			System.out.println("The following surrounding matches indicates a low context similarity:");
+			for (int i = 0; i < invalidSourceFeatures.size(); i++) {
+				double degreeDiff = Math.abs(sourceDegrees.get(invalidFeatureIndices.get(i)) - targetDegrees.get(invalidFeatureIndices.get(i)));
+				System.out.println("\t" + invalidSourceFeatures.get(i).getID() + "--" + invalidTargetFeatures.get(i).getID() + ": degree difference: " + String.format("%.4f", degreeDiff));
+			}
+		}
+		// print the unmatched surrounding features
+		if (sourceUnMatchedFeatures.size() > 0 || targetUnMatchedFeatures.size() > 0) {
+			System.out.println("The following surrounding object has no matching relations: ");
+			for (int i = 0; i < sourceUnMatchedFeatures.size(); i++) {
+				System.out.println("\tSource layer object id = " + sourceUnMatchedFeatures.get(i).getID());
+			}
+			for (int i = 0; i < targetUnMatchedFeatures.size(); i++) {
+				System.out.println("\tTarget layer object id = " + targetUnMatchedFeatures.get(i).getID());
+			}
+		}
+		 
+		 
+		sharedSpace.storeInvalidSurrMatchList(invalidSourceFeatures, invalidTargetFeatures);
 		
 		return res;
 	}

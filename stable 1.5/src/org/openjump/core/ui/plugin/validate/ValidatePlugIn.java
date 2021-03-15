@@ -69,7 +69,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 
 	@Override
 	public void run(TaskMonitor monitor, PlugInContext context) throws Exception {
-		contextSimilarityCalculator = new StarContextCalculator(20);
+		contextSimilarityCalculator = new StarContextCalculator(sharedSpace.STAR_DEGREE_RANGE);
 		this.matchList = sharedSpace.getMatchList();
 		matchList.clear();
 		System.gc();

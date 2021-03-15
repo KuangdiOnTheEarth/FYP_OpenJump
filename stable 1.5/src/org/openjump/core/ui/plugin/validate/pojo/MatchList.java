@@ -178,7 +178,7 @@ public class MatchList {
 			return validationStatuses.get(i) == INVALID;
 		} else {
 //			System.out.println("--isInvalid-- Not found id = " + sourceFeature.getID());
-			return false;
+			return true;
 		}
 	}
 	
