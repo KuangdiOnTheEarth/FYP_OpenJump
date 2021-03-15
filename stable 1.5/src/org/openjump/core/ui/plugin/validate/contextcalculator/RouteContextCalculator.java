@@ -13,6 +13,8 @@ import com.vividsolutions.jump.feature.Feature;
 
 public class RouteContextCalculator extends AbstractContextCalculator{
 	
+	private String name = "Sequence Order Context Similarity";
+	
 	public double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> sourceSurr, boolean visualize) {
 		// if equals null, use the recorded surrounding object set
 		if (sourceSurr == null) {
@@ -52,15 +54,17 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 			Double sin = yDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
 			Double cos = xDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
 			
-//			if (sin >= 0 || sin < 0 ) {
-//			} else {
-//				System.out.println("sin = " + yDiff + " / " + Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5) + "(c:" + center.getID() + "--" +f.getID());
-//			}
-			
 			RelativePosition p = new RelativePosition(f, sin, cos);
 			sequence.add(p);
 		}
 		return sequence;
+	}
+	
+	
+	@Override
+	public double checkContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 	/**

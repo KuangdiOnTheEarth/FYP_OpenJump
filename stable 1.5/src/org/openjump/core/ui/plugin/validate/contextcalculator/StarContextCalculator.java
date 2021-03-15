@@ -12,6 +12,7 @@ public class StarContextCalculator extends AbstractContextCalculator{
 	
 	private int numSections;
 	private int degreeRange;
+	private String name = "Star Calculus Context Similarity";
 	
 	public StarContextCalculator(int degreeSectionRange) {
 		this.numSections = 360 / degreeSectionRange;
@@ -141,7 +142,7 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		
 		double res = (double)sameSectionCount / (double)numSurroundingObjects;
 		
-		System.out.println("Context Similarity: " + String.format("%.4f (%d/%d)", res, sameSectionCount, numSurroundingObjects));
+		System.out.println(name + ": " + String.format("%.4f (%d/%d)", res, sameSectionCount, numSurroundingObjects));
 		
 		// print degree list
 		System.out.println(sourceFeature.getID() + ": ");

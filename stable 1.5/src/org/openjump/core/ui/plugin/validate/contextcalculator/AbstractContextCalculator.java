@@ -13,6 +13,7 @@ public abstract class AbstractContextCalculator {
 	protected SharedSpace sharedSpace;
 	protected MatchList matchList;
 	protected SupportingRelations supportingRelations;
+	protected String name;
 	
 	public AbstractContextCalculator() {
 		sharedSpace = SharedSpace.getInstance();
@@ -20,6 +21,8 @@ public abstract class AbstractContextCalculator {
 	}
 	
 	public abstract double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> sourceSurr, boolean isBackTrack);
+	
+	public abstract double checkContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr);
 
 	public void refreshSupportingRelation() {
 		supportingRelations = sharedSpace.getSupportingRelations();

@@ -46,6 +46,8 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	private AbstractContextCalculator contextSimilarityCalculator;
 	
 	private String pluginName = "ValidateAbstractPlugIn";
+	private String contextSimilarityType = "star";
+	private String objectSimilarityType = "overlay";
 	
 	public void initialize(PlugInContext context) throws Exception {
 	    FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
@@ -69,6 +71,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 
 	@Override
 	public void run(TaskMonitor monitor, PlugInContext context) throws Exception {
+		sharedSpace.setSimilarityType(contextSimilarityType, objectSimilarityType);
 		contextSimilarityCalculator = new StarContextCalculator(sharedSpace.STAR_DEGREE_RANGE);
 		this.matchList = sharedSpace.getMatchList();
 		matchList.clear();

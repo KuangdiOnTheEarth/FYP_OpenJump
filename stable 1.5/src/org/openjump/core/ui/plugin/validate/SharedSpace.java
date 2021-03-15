@@ -2,6 +2,9 @@ package org.openjump.core.ui.plugin.validate;
 
 import java.util.ArrayList;
 
+import org.openjump.core.ui.plugin.validate.contextcalculator.AbstractContextCalculator;
+import org.openjump.core.ui.plugin.validate.contextcalculator.RouteContextCalculator;
+import org.openjump.core.ui.plugin.validate.contextcalculator.StarContextCalculator;
 import org.openjump.core.ui.plugin.validate.pojo.MatchList;
 import org.openjump.core.ui.plugin.validate.pojo.SupportingRelations;
 
@@ -22,6 +25,13 @@ public class SharedSpace {
 	private Pair<ArrayList<Feature>, ArrayList<Feature>> invalidSurrMatches = null;
 	
 	private SharedSpace() {}
+	
+	private final String CS_STAR = "star";
+	private final String CS_SEQ = "sequence";
+	private final String OS_OVERLAY = "overlay";
+	
+	private String currentContextSimilarityType = CS_STAR;
+	private String currentObjectSimilarityType = OS_OVERLAY;
 	
 	public final int STAR_DEGREE_RANGE = 10;
 	
@@ -75,4 +85,30 @@ public class SharedSpace {
 	public Pair<ArrayList<Feature>, ArrayList<Feature>> getInvalidSurrMatchList() {
 		return this.invalidSurrMatches;
 	}
+	
+	public void setSimilarityType(String contextSimilarityType, String objectSimilarityType) {
+		if (contextSimilarityType == CS_STAR) {
+			currentContextSimilarityType = CS_STAR;
+		} else if (contextSimilarityType == CS_SEQ) {
+			currentContextSimilarityType = CS_SEQ;
+		}
+		
+		if (objectSimilarityType == OS_OVERLAY) {
+			currentObjectSimilarityType = OS_OVERLAY;
+		}
+	}
+	
+	public AbstractContextCalculator getContextCalculator() {
+		if (currentContextSimilarityType == CS_STAR) {
+			return new StarContextCalculator(this.STAR_DEGREE_RANGE);
+		} else if (currentContextSimilarityType == CS_SEQ) {
+			return new RouteContextCalculator();
+		} 
+		
+		
+		else {
+			return new StarContextCalculator(this.STAR_DEGREE_RANGE);
+		}
+	}
+	
 }

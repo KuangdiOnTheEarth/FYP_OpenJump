@@ -3,6 +3,7 @@ package org.openjump.core.ui.plugin.validate;
 import java.util.ArrayList;
 
 import org.openjump.core.ui.plugin.AbstractUiPlugIn;
+import org.openjump.core.ui.plugin.validate.contextcalculator.AbstractContextCalculator;
 import org.openjump.core.ui.plugin.validate.contextcalculator.StarContextCalculator;
 import org.openjump.core.ui.plugin.validate.pojo.AntiClockwiseSequence;
 import org.openjump.core.ui.plugin.validate.pojo.MatchList;
@@ -130,7 +131,8 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
         context.addLayer(StandardCategoryNames.WORKING, "check" + sourceFeature.getID(), surrColl);			
         
         // create list to contain the target objects from invalid matches
-        StarContextCalculator contextCalculator = new StarContextCalculator(sharedSpace.STAR_DEGREE_RANGE);
+//        StarContextCalculator contextCalculator = new StarContextCalculator(sharedSpace.STAR_DEGREE_RANGE);
+        AbstractContextCalculator contextCalculator = sharedSpace.getContextCalculator();
         contextCalculator.checkContextSimilarity(sourceFeature, sourceSurr);
         ArrayList<Feature> invalidMatches = sharedSpace.getInvalidSurrMatchList().getValue();
         surrColl = new FeatureDataset(fs);
