@@ -98,8 +98,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 			System.out.println("No feature of ID = " + featureID + " can be found");
 		}
 		Geometry sfGeom = sourceFeature.getGeometry();
-		Point sfCentroid =  sfGeom.getCentroid();
-		Geometry buffer = sfCentroid.buffer(matchList.getBufferRadius(sourceFeature));
+		Geometry buffer = sfGeom.buffer(matchList.getBufferRadius(sourceFeature));
 		
 		// create a feature collection to visualize surrounding features in a new layer 
 		FeatureCollection surrColl = null; // the feature collection of surrounding objects of a source layer feature
@@ -112,9 +111,9 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 		surrColl.add(centroid);
 		
         // add the buffer into feature collection
-//        Feature bufferFeature = sourceFeature.clone(false);
-//        bufferFeature.setGeometry(buffer);
-//        surrColl.add(bufferFeature);
+        Feature bufferFeature = sourceFeature.clone(false);
+        bufferFeature.setGeometry(buffer);
+        surrColl.add(bufferFeature);
         
         // create lists to contain the surrounding objects in source layer
         ArrayList<Feature> sourceSurr = sharedSpace.getSupportingRelations().getSupportingFeaturesOf(sourceFeature);
@@ -149,7 +148,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
         context.addLayer(StandardCategoryNames.WORKING, "invalid surr " + sourceFeature.getID(), surrColl);	
 		
 		
-		System.out.println("\n");
+		System.out.println("done\n");
 	    
 	}
 

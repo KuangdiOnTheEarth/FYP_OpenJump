@@ -153,16 +153,14 @@ public class AntiClockwiseSequence {
 		// the corresponding indices of source list
 		ArrayList<Integer> sourceIndices = new ArrayList<Integer>();
 		// remove the single objects from source feature sequence
-		int index = 0;
-		for (Feature sf : sourceFeatures) {
+		for (int j = 0; j < sourceFeatures.size(); j++) {
 			for (int i = 0; i < targetFeatures.size() ; i++) {
-				if (matchList.getMatchedTargetFeature(sf) == targetFeatures.get(i)) {
+				if (matchList.getMatchedTargetFeature(sourceFeatures.get(j)) == targetFeatures.get(i)) {
 					corrIndices.add(i);
-					sourceIndices.add(index);
+					sourceIndices.add(j);
 					break;
 				}
 			}
-			index++;
 		}
 		if (corrIndices.size() == 0) {
 			return 0.0;
@@ -178,37 +176,34 @@ public class AntiClockwiseSequence {
 			int nextStartIndex = -1;
 			int count = 1;
 			int temp = corrIndices.get(startIndex);
-			ArrayList<Integer> tempSourceInorderIndices = new ArrayList<Integer>();
-			ArrayList<Integer> tempTargetInorderIndices = new ArrayList<Integer>();
-			tempSourceInorderIndices.add(corrIndices.get(startIndex));
-			tempTargetInorderIndices.add(corrIndices.get(startIndex));
+			ArrayList<Integer> tempSourceNotInorderIndices = new ArrayList<Integer>();
+			ArrayList<Integer> tempTargetNotInorderIndices = new ArrayList<Integer>();
 			for (int i = 1; i + startIndex < corrIndices.size(); i++) {
-				if (corrIndices.get(startIndex + i) > temp) {
+				if (corrIndices.get(startIndex + i) >= temp) {
 					temp = corrIndices.get(startIndex + i);
-					tempSourceInorderIndices.add(sourceIndices.get(startIndex + i));
-					tempTargetInorderIndices.add(corrIndices.get(startIndex + i));
 					count++;
 				} else {
+					tempSourceNotInorderIndices.add(sourceIndices.get(startIndex + i));
+					tempTargetNotInorderIndices.add(corrIndices.get(startIndex + i));
 					if (nextStartIndex == -1) {
 						nextStartIndex = startIndex + i;
 					}
 				}
 			}
 //			maxInOrder = Math.max(maxInOrder, count);
+
 			if (count > maxInOrder) {
 				maxInOrder = count;
 				invalidSourceFeatures.clear();
 				invalidTargetFeatures.clear();
-				for (int i : sourceIndices) {
-					if (!tempSourceInorderIndices.contains(i)) {
-						invalidSourceFeatures.add(sourceFeatures.get(i));
-					}
+				for (int i : tempSourceNotInorderIndices) {
+					invalidSourceFeatures.add(sourceFeatures.get(i));
 				}
-				for (int i : corrIndices) {
-					if (!tempTargetInorderIndices.contains(i)) {
-						invalidTargetFeatures.add(targetFeatures.get(i));
-					}
+				for (int i : tempTargetNotInorderIndices) {
+					invalidTargetFeatures.add(targetFeatures.get(i));
 				}
+				
+				System.out.println(invalidSourceFeatures.size() + " " + invalidTargetFeatures.size());
 			}
 			if (startIndex < nextStartIndex) {
 				startIndex = nextStartIndex;
@@ -224,6 +219,7 @@ public class AntiClockwiseSequence {
 //			}
 			System.out.println("The following surrounding matches are not inorder amonge the neighbouring sequence:");
 			System.out.println(invalidSourceFeatures.size() + " " + invalidTargetFeatures.size());
+
 			for (int i = 0; i < invalidSourceFeatures.size(); i++) {
 				System.out.println("\t" + invalidSourceFeatures.get(i).getID() + " -- " + invalidTargetFeatures.get(i).getID());
 			}

@@ -71,16 +71,16 @@
     <mapping>
       <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.FILES</key>
       <value class="java.util.LinkedHashSet">
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/watershed.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/hedgerow.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/frenchprovinces.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/landcover2000.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/subwatershed.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/departement22.shp</item>
         <item class="java.lang.String">/Users/gungnir/Downloads/general_tutorial_oj15_w_data/freedata/municipalities22.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/OrdnanceSurvey/OS VectorMap District (ESRI Shape File) SW/data/SW_Building.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/statsilk/StatPlanet_USA_County/map/map.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/tapiquen/USA_Counties/USA_Counties.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/darling/Lee County/Building_Footprints.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/ArcGis/Las Cruces/Building_Footprints.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/ArcGis/Prince George/Building_Outlines.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/darling/planet_-82.314_26.26_0542a81a-shp/shape/buildings.shp</item>
       </value>
     </mapping>
     <mapping>

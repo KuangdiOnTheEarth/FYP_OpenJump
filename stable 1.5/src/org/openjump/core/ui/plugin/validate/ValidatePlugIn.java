@@ -108,11 +108,12 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			Geometry sfGeom = sourceFeature.getGeometry();
 			Point sfCentroid =  sfGeom.getCentroid();
 			ArrayList<Feature> sourceSurr = new ArrayList<Feature>();	
-			double radius = bufferRadius;
-			Geometry buffer = sfCentroid.buffer(radius);
+			double radius = sfGeom.getLength() / 2; // initialize buffer radius
+//			Geometry buffer = sfCentroid.buffer(radius);
+			Geometry buffer = sfGeom.buffer(radius);
 			while (sourceSurr.size() < MIN_SURR_OBJ_NEEDED) {
 				sourceSurr.clear();
-				buffer = sfCentroid.buffer(radius);
+				buffer = sfGeom.buffer(radius);
 //				Geometry buffer = sfCentroid.buffer(radius);
 		        // create lists to contain the surrounding objects
 				for (Feature f : sourceFeatures) {
