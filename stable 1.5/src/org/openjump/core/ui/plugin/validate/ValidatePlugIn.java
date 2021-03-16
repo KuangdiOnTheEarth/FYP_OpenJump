@@ -41,7 +41,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	private MatchList matchList;
 	private SupportingRelations supportingRelations;
 	
-	private final double bufferRadius = 0.5;
+//	private final double bufferRadius = 0.5;
 	private boolean VISUALIZE_VALIDATION_PROCESS = false;
 	private AbstractContextCalculator contextSimilarityCalculator;
 	
@@ -107,9 +107,10 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			// create a buffer of center object
 			Geometry sfGeom = sourceFeature.getGeometry();
 			Point sfCentroid =  sfGeom.getCentroid();
-			ArrayList<Feature> sourceSurr = new ArrayList<Feature>();	
-			double radius = sfGeom.getLength() / 2; // initialize buffer radius
-//			Geometry buffer = sfCentroid.buffer(radius);
+			ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
+			
+//			double radius = sfGeom.getLength(); // initialize buffer radius
+			double radius = Math.pow(sfGeom.getArea(), 1/2) / 4;
 			Geometry buffer = sfGeom.buffer(radius);
 			while (sourceSurr.size() < MIN_SURR_OBJ_NEEDED) {
 				sourceSurr.clear();
