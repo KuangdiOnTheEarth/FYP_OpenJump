@@ -22,7 +22,7 @@ public class SharedSpace {
 	
 	private MatchList matchList = null;
 	private SupportingRelations supportingRelations = null;
-	private Pair<ArrayList<Feature>, ArrayList<Feature>> invalidSurrMatches = null;
+	private Pair<ArrayList<Feature>, ArrayList<Feature>> invalidSurrMatches = null; // source invalid features, matched target layer objects
 	
 	private SharedSpace() {}
 	

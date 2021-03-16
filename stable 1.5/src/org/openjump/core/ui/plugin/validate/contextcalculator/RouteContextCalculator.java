@@ -15,13 +15,19 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 	
 	private String name = "Sequence Order Context Similarity";
 	
-	public double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> sourceSurr, boolean visualize) {
+	public double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr, boolean visualize) {
 		// if equals null, use the recorded surrounding object set
-		if (sourceSurr == null) {
-			sourceSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
+		if (srcSurr == null) {
+			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
 		}
-		if (sourceSurr.size() == 0) {
+		if (srcSurr.size() == 0) {
 			return 0.0;
+		}
+		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
+		for (Feature f : srcSurr) {
+			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
+				sourceSurr.add(f);
+			}
 		}
 		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
 		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), matchList.getMatchedTargetFeature(sourceFeature));
@@ -63,8 +69,22 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 	
 	@Override
 	public double checkContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (srcSurr == null) {
+			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
+		}
+		if (srcSurr.size() == 0) {
+			return 0.0;
+		}
+		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
+		for (Feature f : srcSurr) {
+			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
+				sourceSurr.add(f);
+			}
+		}
+		System.out.println("Checking " + this.name);
+		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
+		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), matchList.getMatchedTargetFeature(sourceFeature));
+		return sourceSeq.checkContextSimilarityWith(targetSeq, true);
 	}
 	
 	/**
