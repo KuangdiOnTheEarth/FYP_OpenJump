@@ -104,40 +104,10 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			// get the object from the match being checked
 			Feature sourceFeature = queue.poll();
 			matchCount++;
-			// create a buffer of center object
-			Geometry sfGeom = sourceFeature.getGeometry();
-			Point sfCentroid =  sfGeom.getCentroid();
-			ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
 			
-			double radius = sfGeom.getLength() / 4 / 4;
-//			double radius = Math.pow(sfGeom.getArea(), 1/2) / 4; // when area < 1, square root of it will become bigger
-			Geometry buffer = sfGeom.buffer(radius);
-			while (sourceSurr.size() < MIN_SURR_OBJ_NEEDED) {
-				sourceSurr.clear();
-				buffer = sfGeom.buffer(radius);
-//				Geometry buffer = sfCentroid.buffer(radius);
-		        // create lists to contain the surrounding objects
-				for (Feature f : sourceFeatures) {
-					if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
-						sourceSurr.add(f);
-					}
-				}
-				radius = radius * BUFFER_INC_RATE;
-			}
-			matchList.setBufferRadius(sourceFeature, radius);
-			// add surrounding features (matches) into queue
-			for (Feature f : sourceSurr) {
-				if (matchList.shouldBeQueued(f)) {
-					queue.add(f);
-					matchList.setAsInQueue(f);
-				}
-			}
+			// find the surrounding matches
+			ArrayList<Feature> sourceSurr = findSurroundingMatch(sourceFeature, sourceFeatures, queue, true);
 			
-			// display the surrounding objects in a new layer
-//			showSurrObjectsInLayer(context, sourceFeature, buffer, sourceSurr);
-			
-			// record the dependency
-			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr);
 			// calculate context similarity
 			double contextSimilarity = calContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr, false);
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
@@ -154,12 +124,126 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		///////////////////////////////////////////
 		// Detect Omitted Matches
 		///////////////////////////////////////////
-		
+		ArrayList<Feature> unmatchedSourceFeatures = matchList.getUnmatchedSourceFeatures();
+		ArrayList<Feature> unmatchedTargetFeatures = matchList.getUnmatchedTargetFeatures();
+
+		// went through single objects in source layer
+		for (Feature singleF : unmatchedSourceFeatures) {
+			ArrayList<Feature> tempMatch = new ArrayList<Feature>();
+			Geometry buffer = singleF.getGeometry();
+			// find potential match object from target matched list
+			for (Feature f : targetFeatures) {
+				if (buffer.intersects(f.getGeometry()) && !tempMatch.contains(f))
+					tempMatch.add(f);
+			}
+			// find potential match object from single target layer objects
+			for (Feature f : matchList.getUnmatchedTargetFeatures()) {
+				if (buffer.intersects(f.getGeometry()) && !tempMatch.contains(f))
+					tempMatch.add(f);
+			}
+			// check the similarity with each potential match object
+			for (Feature potentialMatchedObject : tempMatch) {
+				ArrayList<Feature> sourceSurr = findSurroundingMatch(singleF, sourceFeatures, null, false);
+				// calculate context similarity
+				double contextSimilarity = calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, false);
+				double confidenceLevel = contextSimilarity;
+				if (confidenceLevel < VALID_THRESHOLD) {
+					// confidenceLevel + object similarity
+				}
+				if (confidenceLevel >= VALID_THRESHOLD) {
+					matchList.storeMatch(singleF, potentialMatchedObject);
+					calContextSimilarity(singleF, matchList.getMatchedTargetFeature(singleF), sourceSurr, true);
+					matchList.setContextSimilarity(singleF, contextSimilarity);
+					matchList.setAsNew(singleF);
+				}
+			}
+		}
+		// went through single objects in target layer
+//		for (Feature singleF : unmatchedTargetFeatures) {
+//			ArrayList<Feature> tempMatch = new ArrayList<Feature>();
+//			Geometry buffer = singleF.getGeometry();
+//			// find potential match object from source matched list
+//			for (Feature f : sourceFeatures) {
+//				if (buffer.intersects(f.getGeometry()) && !tempMatch.contains(f))
+//					tempMatch.add(f);
+//			}
+//			// find potential match object from single source layer objects
+//			for (Feature f : matchList.getUnmatchedSourceFeatures()) {
+//				if (buffer.intersects(f.getGeometry()) && !tempMatch.contains(f))
+//					tempMatch.add(f);
+//			}
+//			// check the similarity with each potential match object
+//			for (Feature f : tempMatch) {
+//				ArrayList<Feature> targetSurr = findSurroundingMatch(singleF, targetFeatures, null, false);
+//				// calculate context similarity
+//				double contextSimilarity = calContextSimilarity(singleF, matchList.getMatchedTargetFeature(singleF), targetSurr, false);
+//				double confidenceLevel = contextSimilarity;
+//				if (confidenceLevel < VALID_THRESHOLD) {
+//					// confidenceLevel + object similarity
+//				}
+//				if (confidenceLevel >= VALID_THRESHOLD) {
+//					calContextSimilarity(singleF, matchList.getMatchedTargetFeature(singleF), sourceSurr, true);
+//					matchList.setContextSimilarity(singleF, contextSimilarity);
+//					matchList.setAsNew(singleF);
+//				}
+//			}
+//		}
 		
 		showResult(context);
 		System.out.println("Validation Finished \n");
 	}
 	
+	/**
+	 * 
+	 * @param sourceFeature
+	 * @param sourceFeatures
+	 * @param queue
+	 * @param recordProcess false: the buffer radius & supporting relation will not be recorded (used in testing potential matches for single objects)
+	 * @return
+	 */
+	private ArrayList<Feature> findSurroundingMatch(Feature sourceFeature, List<Feature> sourceFeatures, Queue<Feature> queue, boolean recordProcess) {
+		// create a buffer of center object
+		Geometry sfGeom = sourceFeature.getGeometry();
+		Point sfCentroid =  sfGeom.getCentroid();
+		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
+		
+		double radius = sfGeom.getLength() / 4 / 4;
+//					double radius = Math.pow(sfGeom.getArea(), 1/2) / 4; // when area < 1, square root of it will become bigger
+		Geometry buffer = sfGeom.buffer(radius);
+		while (sourceSurr.size() < MIN_SURR_OBJ_NEEDED) {
+			sourceSurr.clear();
+			buffer = sfGeom.buffer(radius);
+//						Geometry buffer = sfCentroid.buffer(radius);
+	        // create lists to contain the surrounding objects
+			for (Feature f : sourceFeatures) {
+				if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
+					sourceSurr.add(f);
+				}
+			}
+			radius = radius * BUFFER_INC_RATE;
+		}
+		if (recordProcess) {
+			matchList.setBufferRadius(sourceFeature, radius);
+		}
+		// add surrounding features (matches) into queue
+		if (queue != null) {
+			for (Feature f : sourceSurr) {
+				if (matchList.shouldBeQueued(f)) {
+					queue.add(f);
+					matchList.setAsInQueue(f);
+				}
+			}
+		}
+		
+		// display the surrounding objects in a new layer
+//					showSurrObjectsInLayer(context, sourceFeature, buffer, sourceSurr);
+		
+		// record the dependency
+		if (recordProcess) {
+			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr);
+		}
+		return sourceSurr;
+	}
 	
 	private void backtrack(Feature invalidFeature) {
 		System.out.println("--BackTrack: " + invalidFeature.getID() + "--");
@@ -256,6 +340,9 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		Pair<FeatureCollection, FeatureCollection> pair = matchList.getValidationResult();
 		context.addLayer(StandardCategoryNames.WORKING, "Valid Matches", pair.getKey());
 		context.addLayer(StandardCategoryNames.WORKING, "Invalid Matches", pair.getValue());
+		Pair<FeatureCollection, FeatureCollection> npair = matchList.getNewMatches();
+		context.addLayer(StandardCategoryNames.WORKING, "New Matches -- source layer", npair.getKey());
+		context.addLayer(StandardCategoryNames.WORKING, "New Matches -- target layer", npair.getValue());
 	}
 
 }

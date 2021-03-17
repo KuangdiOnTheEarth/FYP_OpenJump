@@ -37,6 +37,7 @@ public class MatchList {
 	private final int INQUEUE      = 1;
 	private final int INVALID      = 2;
 	private final int VALID        = 3;
+	private final int NEW          = 4;
 	
 	/**
 	 * The following fields are used for detecting omitted matches
@@ -231,10 +232,18 @@ public class MatchList {
 		}
 	}
 	
+	public void setAsNew(Feature sourceFeature) {
+//		hMap.put(sourceFeature.getID(), VALID);
+		int i = sourceFeatureList.indexOf(sourceFeature);
+		if (i >= 0) {
+			validationStatuses.set(i, NEW);
+		}
+	}
+	
 	public boolean isInvalid(Feature sourceFeature) {
 		int i = sourceFeatureList.indexOf(sourceFeature);
 		if (i >= 0) {
-			return validationStatuses.get(i) == INVALID;
+			return validationStatuses.get(i) == INVALID || validationStatuses.get(i) == NEW; // ignore newly detected omitted matches
 		} else {
 //			System.out.println("--isInvalid-- Not found id = " + sourceFeature.getID());
 			return true;
@@ -286,6 +295,10 @@ public class MatchList {
 		return 0;
 	}
 	
+	public double getContextWeight() {
+		return CONTEXT_SIMILARITY_WEIGHT;
+	}
+	
 	/**
 	 * 
 	 * @return a set of all VALID matches and a set of all INVALID matches
@@ -306,6 +319,25 @@ public class MatchList {
 		return new Pair<FeatureCollection, FeatureCollection>(validColl, invalidColl);
 	}
 	
+	/**
+	 * 
+	 * @return the newly discovered matches for single objects
+	 */
+	public Pair<FeatureCollection, FeatureCollection> getNewMatches() {
+		FeatureCollection sourceColl = null;
+		FeatureCollection targetColl = null;
+		FeatureSchema fs = sourceFeatureList.get(0).getSchema();
+		sourceColl = new FeatureDataset(fs);
+		targetColl = new FeatureDataset(fs);
+		for (int i = 0; i < sourceFeatureList.size(); i++) {
+			if (validationStatuses.get(i) == NEW) {
+				sourceColl.add(sourceFeatureList.get(i).clone(false));
+				targetColl.add(targetFeatureList.get(i).clone(false));
+			}
+		}
+		return new Pair<FeatureCollection, FeatureCollection>(sourceColl, targetColl);
+	}
+	
 	public void setBufferRadius(Feature feature, double r) {
 		int i = sourceFeatureList.indexOf(feature);
 		if (i >= 0) {
@@ -321,4 +353,11 @@ public class MatchList {
 		return bufferRadiusList.get(i);
 	}
 
+	public ArrayList<Feature> getUnmatchedSourceFeatures() {
+		return this.unmatchedSourceFeatures;
+	}
+	
+	public ArrayList<Feature> getUnmatchedTargetFeatures() {
+		return this.unmatchedTargetFeatures;
+	}
 }

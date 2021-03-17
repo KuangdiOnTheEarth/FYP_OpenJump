@@ -24,6 +24,14 @@ public class SharedSpace {
 	private SupportingRelations supportingRelations = null;
 	private Pair<ArrayList<Feature>, ArrayList<Feature>> invalidSurrMatches = null; // source invalid features, matched target layer objects
 	
+	/**
+	 * The following are for checking omitted matches
+	 */
+	private MatchList omittedMatchList = null;
+	private SupportingRelations omittedSupportingRelations = null;
+	private Pair<ArrayList<Feature>, ArrayList<Feature>> omittedInvalidSurrMatches = null; // source invalid features, matched target layer objects
+	
+	
 	private SharedSpace() {}
 	
 	private final String CS_STAR = "star";
@@ -49,11 +57,20 @@ public class SharedSpace {
 	
 	public void storeMatchList(MatchList matchList) {
 		this.matchList = matchList;
-		System.out.println("--SharedSpace-- match list has been stored");
+//		System.out.println("--SharedSpace-- match list has been stored");
 	}
 	
 	public MatchList getMatchList() {
 		return this.matchList;
+	}
+	
+	public void storeOmittedMatchList(MatchList matchList) {
+		this.omittedMatchList = matchList;
+//		System.out.println("--SharedSpace-- omittedMatchList has been stored");
+	}
+	
+	public MatchList getOmittedMatchList() {
+		return this.omittedMatchList;
 	}
 	
 	
@@ -78,12 +95,28 @@ public class SharedSpace {
 		return this.supportingRelations;
 	}
 	
+	public void storeOmittedSupportingRelations(SupportingRelations sr) {
+		this.omittedSupportingRelations = sr;
+	}
+	
+	public SupportingRelations getOmittedSupportingRelations() {
+		return this.omittedSupportingRelations;
+	}
+	
 	public void storeInvalidSurrMatchList(ArrayList<Feature> sourceFeatures, ArrayList<Feature> targetFeatures) {
 		this.invalidSurrMatches = new Pair<>(sourceFeatures, targetFeatures);
 	}
 	
 	public Pair<ArrayList<Feature>, ArrayList<Feature>> getInvalidSurrMatchList() {
 		return this.invalidSurrMatches;
+	}
+	
+	public void storeOmittedInvalidSurrMatchList(ArrayList<Feature> sourceFeatures, ArrayList<Feature> targetFeatures) {
+		this.omittedInvalidSurrMatches = new Pair<>(sourceFeatures, targetFeatures);
+	}
+	
+	public Pair<ArrayList<Feature>, ArrayList<Feature>> getOmittedInvalidSurrMatchList() {
+		return this.omittedInvalidSurrMatches;
 	}
 	
 	public void setSimilarityType(String contextSimilarityType, String objectSimilarityType) {
