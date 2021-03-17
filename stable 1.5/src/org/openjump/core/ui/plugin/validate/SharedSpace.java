@@ -33,7 +33,7 @@ public class SharedSpace {
 	private String currentContextSimilarityType = CS_STAR;
 	private String currentObjectSimilarityType = OS_OVERLAY;
 	
-	public final int STAR_DEGREE_RANGE = 10;
+	public final int STAR_DEGREE_RANGE = 5;
 	
 	/**
 	 * The instance getter of Single Pattern

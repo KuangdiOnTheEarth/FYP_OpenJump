@@ -46,7 +46,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	private AbstractContextCalculator contextSimilarityCalculator;
 	
 	private String pluginName = "ValidateAbstractPlugIn";
-	private String contextSimilarityType = "sequence";
+	private String contextSimilarityType = "sequence"; // star || sequence
 	private String objectSimilarityType = "overlay";
 	
 	public void initialize(PlugInContext context) throws Exception {
@@ -109,8 +109,8 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			Point sfCentroid =  sfGeom.getCentroid();
 			ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
 			
-//			double radius = sfGeom.getLength(); // initialize buffer radius
-			double radius = Math.pow(sfGeom.getArea(), 1/2) / 4;
+			double radius = sfGeom.getLength() / 4 / 4;
+//			double radius = Math.pow(sfGeom.getArea(), 1/2) / 4; // when area < 1, square root of it will become bigger
 			Geometry buffer = sfGeom.buffer(radius);
 			while (sourceSurr.size() < MIN_SURR_OBJ_NEEDED) {
 				sourceSurr.clear();
