@@ -121,6 +121,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
         	System.out.println("No surruonding objects detected");
         	return;
         }
+
         for (Feature f : sourceSurr) {
         	surrColl.add(f.clone(false)); 
 			Feature cp = f.clone(false);
@@ -128,12 +129,13 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 			surrColl.add(cp);
         }
         context.addLayer(StandardCategoryNames.WORKING, "check" + sourceFeature.getID(), surrColl);			
-        
+
         // create list to contain the target objects from invalid matches
 //        StarContextCalculator contextCalculator = new StarContextCalculator(sharedSpace.STAR_DEGREE_RANGE);
         AbstractContextCalculator contextCalculator = sharedSpace.getContextCalculator();
         contextCalculator.checkContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr);
         ArrayList<Feature> invalidMatches = sharedSpace.getInvalidSurrMatchList().getValue();
+
         surrColl = new FeatureDataset(fs);
         for (Feature f : invalidMatches) {
         	surrColl.add(f.clone(false)); 
@@ -141,6 +143,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 			cp.setGeometry(f.getGeometry().getCentroid());
 			surrColl.add(cp);
         }
+
         Feature targetFeature = matchList.getMatchedTargetFeature(sourceFeature);
         Feature targetCentroid = targetFeature.clone(false);
         targetCentroid.setGeometry(targetFeature.getGeometry().getCentroid());

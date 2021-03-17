@@ -106,7 +106,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			matchCount++;
 			
 			// find the surrounding matches
-			ArrayList<Feature> sourceSurr = findSurroundingMatch(sourceFeature, sourceFeatures, queue, true);
+			ArrayList<Feature> sourceSurr = findSurroundingMatch(sourceFeature, sourceFeatures, queue, true, false);
 			
 			// calculate context similarity
 			double contextSimilarity = calContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr, false);
@@ -143,7 +143,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			}
 			// check the similarity with each potential match object
 			for (Feature potentialMatchedObject : tempMatch) {
-				ArrayList<Feature> sourceSurr = findSurroundingMatch(singleF, sourceFeatures, null, false);
+				ArrayList<Feature> sourceSurr = findSurroundingMatch(singleF, sourceFeatures, null, false, false);
 				// calculate context similarity
 				double contextSimilarity = calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, false);
 				double confidenceLevel = contextSimilarity;
@@ -152,9 +152,11 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 				}
 				if (confidenceLevel >= VALID_THRESHOLD) {
 					matchList.storeMatch(singleF, potentialMatchedObject);
-					calContextSimilarity(singleF, matchList.getMatchedTargetFeature(singleF), sourceSurr, true);
-					matchList.setContextSimilarity(singleF, contextSimilarity);
 					matchList.setAsNew(singleF);
+					supportingRelations.addMatchSpace();
+					findSurroundingMatch(singleF, sourceFeatures, null, true, true);
+					calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, true);
+					matchList.setContextSimilarity(singleF, contextSimilarity);
 				}
 			}
 		}
@@ -201,7 +203,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	 * @param recordProcess false: the buffer radius & supporting relation will not be recorded (used in testing potential matches for single objects)
 	 * @return
 	 */
-	private ArrayList<Feature> findSurroundingMatch(Feature sourceFeature, List<Feature> sourceFeatures, Queue<Feature> queue, boolean recordProcess) {
+	private ArrayList<Feature> findSurroundingMatch(Feature sourceFeature, List<Feature> sourceFeatures, Queue<Feature> queue, boolean recordProcess, boolean omittedMatch) {
 		// create a buffer of center object
 		Geometry sfGeom = sourceFeature.getGeometry();
 		Point sfCentroid =  sfGeom.getCentroid();
@@ -240,7 +242,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		
 		// record the dependency
 		if (recordProcess) {
-			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr);
+			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr, omittedMatch);
 		}
 		return sourceSurr;
 	}

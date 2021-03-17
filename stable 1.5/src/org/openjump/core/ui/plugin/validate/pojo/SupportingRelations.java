@@ -28,18 +28,30 @@ public class SupportingRelations {
 		}
 	}
 	
+	public void addMatchSpace() {
+		beSupportedBy.add(new ArrayList<Feature>());
+		supports.add(new ArrayList<Feature>());
+	}
 	
-	public void addSupportingRelation(Feature beSupportedFeature, ArrayList<Feature> ss) {
+	/**
+	 * 
+	 * @param beSupportedFeature
+	 * @param ss
+	 * @param omittedMatch true if the current match is omitted match, so it can only be supported by others, but not support other matches
+	 */
+	public void addSupportingRelation(Feature beSupportedFeature, ArrayList<Feature> ss, boolean omittedMatch) {
 		if (ss.isEmpty()) {
 //			System.out.println("No supporting relation need to be recorded for id = " + beSupportedFeature.getID());
 			return;
 		}
-		for (Feature f : ss) {
-			int index = features.indexOf(f);
-			if (index == -1) {
-//				System.out.println("--SupportingRelations-- not found record of id = " + f.getID());
-			} else {
-				supports.get(index).add(beSupportedFeature);
+		if (!omittedMatch) {
+			for (Feature f : ss) {
+				int index = features.indexOf(f);
+				if (index == -1) {
+					System.out.println("--SupportingRelations-- not found record of id = " + f.getID());
+				} else {
+					supports.get(index).add(beSupportedFeature);
+				}
 			}
 		}
 		
