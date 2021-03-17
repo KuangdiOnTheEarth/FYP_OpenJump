@@ -20,9 +20,9 @@ public abstract class AbstractContextCalculator {
 		matchList = sharedSpace.getMatchList();
 	}
 	
-	public abstract double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> sourceSurr, boolean isBackTrack);
+	public abstract double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> sourceSurr, boolean isBackTrack);
 	
-	public abstract double checkContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr);
+	public abstract double checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr);
 
 	public void refreshSupportingRelation() {
 		supportingRelations = sharedSpace.getSupportingRelations();

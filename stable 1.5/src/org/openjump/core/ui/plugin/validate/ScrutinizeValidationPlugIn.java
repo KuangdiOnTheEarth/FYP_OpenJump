@@ -132,7 +132,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
         // create list to contain the target objects from invalid matches
 //        StarContextCalculator contextCalculator = new StarContextCalculator(sharedSpace.STAR_DEGREE_RANGE);
         AbstractContextCalculator contextCalculator = sharedSpace.getContextCalculator();
-        contextCalculator.checkContextSimilarity(sourceFeature, sourceSurr);
+        contextCalculator.checkContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr);
         ArrayList<Feature> invalidMatches = sharedSpace.getInvalidSurrMatchList().getValue();
         surrColl = new FeatureDataset(fs);
         for (Feature f : invalidMatches) {

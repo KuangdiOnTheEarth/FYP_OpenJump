@@ -19,7 +19,7 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		this.degreeRange = degreeSectionRange;
 	}
 	
-	public double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr, boolean visualize) {
+	public double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr, boolean visualize) {
 		if (srcSurr == null) {
 			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
 		}
@@ -54,7 +54,7 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		}
 		
 		ArrayList<Double> sourceDegrees = getDegreeList(sourceMatchedFeatures, sourceFeature);
-		ArrayList<Double> targetDegrees = getDegreeList(targetMatchedFeatures, matchList.getMatchedTargetFeature(sourceFeature));
+		ArrayList<Double> targetDegrees = getDegreeList(targetMatchedFeatures, targetFeature);
 		
 		int sameSectionCount = 0;
 		for (int i = 0; i < sourceDegrees.size(); i++) {
@@ -75,7 +75,7 @@ public class StarContextCalculator extends AbstractContextCalculator{
 	}
 	
 	
-	public double checkContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr) {
+	public double checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr) {
 		if (srcSurr == null) {
 			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
 		}
@@ -117,7 +117,7 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		}
 		
 		ArrayList<Double> sourceDegrees = getDegreeList(sourceMatchedFeatures, sourceFeature);
-		ArrayList<Double> targetDegrees = getDegreeList(targetMatchedFeatures, matchList.getMatchedTargetFeature(sourceFeature));
+		ArrayList<Double> targetDegrees = getDegreeList(targetMatchedFeatures, targetFeature);
 		ArrayList<Feature> invalidSourceFeatures = new ArrayList<Feature>();
 		ArrayList<Feature> invalidTargetFeatures = new ArrayList<Feature>();
 		ArrayList<Integer> invalidFeatureIndices = new ArrayList<Integer>();

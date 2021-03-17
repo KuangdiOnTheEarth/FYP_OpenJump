@@ -139,7 +139,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			// record the dependency
 			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr);
 			// calculate context similarity
-			double contextSimilarity = calContextSimilarity(sourceFeature, sourceSurr, false);
+			double contextSimilarity = calContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr, false);
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
 			// backtrack if the match is considered as invalid
 			if (contextSimilarity >= VALID_THRESHOLD) {
@@ -193,7 +193,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 						double preCS = matchList.getContextSimilarity(f); // context similarity
 						double preOS = matchList.getObjectSimilarity(f); // object similarity
 						double preCL = matchList.getContextSimilarity(f); // confidence level
-						double contextSimilarity = calContextSimilarity(f, null, true);
+						double contextSimilarity = calContextSimilarity(f, matchList.getMatchedTargetFeature(f), null, true);
 						matchList.setContextSimilarity(f, contextSimilarity);
 						if (matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
 							System.out.println(String.format("\t\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;%.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
@@ -210,8 +210,8 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	}
 	
 	
-	private double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> sourceSurr, boolean isBackTrack) {
-		return contextSimilarityCalculator.calContextSimilarity(sourceFeature, sourceSurr, isBackTrack);
+	private double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> sourceSurr, boolean isBackTrack) {
+		return contextSimilarityCalculator.calContextSimilarity(sourceFeature, targetFeature, sourceSurr, isBackTrack);
 	}
 	
 	

@@ -15,7 +15,7 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 	
 	private String name = "Sequence Order Context Similarity";
 	
-	public double calContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr, boolean visualize) {
+	public double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr, boolean visualize) {
 		// if equals null, use the recorded surrounding object set
 		if (srcSurr == null) {
 			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
@@ -30,7 +30,7 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 			}
 		}
 		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
-		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), matchList.getMatchedTargetFeature(sourceFeature));
+		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), targetFeature);
 		return sourceSeq.calContextSimilarityWith(targetSeq, visualize);
 	}
 	
@@ -68,7 +68,7 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 	
 	
 	@Override
-	public double checkContextSimilarity(Feature sourceFeature, ArrayList<Feature> srcSurr) {
+	public double checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr) {
 		if (srcSurr == null) {
 			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
 		}
@@ -83,7 +83,7 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 		}
 		System.out.println("Checking " + this.name);
 		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
-		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), matchList.getMatchedTargetFeature(sourceFeature));
+		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), targetFeature);
 		return sourceSeq.checkContextSimilarityWith(targetSeq, true);
 	}
 	
