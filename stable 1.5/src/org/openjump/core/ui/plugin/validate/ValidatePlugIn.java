@@ -95,15 +95,15 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		sharedSpace.storeSupportingRelations(supportingRelations);
 		contextSimilarityCalculator.refreshSupportingRelation();
 		int matchCount = 0;
-		
-//		Queue<Feature> queueValidated = new LinkedList<Feature>();
+				
+		///////////////////////////////////////////
+		// Validate Existing Matches
+		///////////////////////////////////////////
 		
 		while (!queue.isEmpty()) {
 			// get the object from the match being checked
 			Feature sourceFeature = queue.poll();
-//			queueValidated.add(sourceFeature);
 			matchCount++;
-//			System.out.print("(" + matchCount + "/" + numFeatures + "):" + sourceFeature.getID() + " & " + matchList.getMatchedTargetFeature(sourceFeature).getID() + ": ");
 			// create a buffer of center object
 			Geometry sfGeom = sourceFeature.getGeometry();
 			Point sfCentroid =  sfGeom.getCentroid();
@@ -150,6 +150,12 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			}
 			
 		}
+		
+		///////////////////////////////////////////
+		// Detect Omitted Matches
+		///////////////////////////////////////////
+		
+		
 		showResult(context);
 		System.out.println("Validation Finished \n");
 	}

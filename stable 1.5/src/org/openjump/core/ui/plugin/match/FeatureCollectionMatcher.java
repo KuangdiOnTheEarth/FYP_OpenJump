@@ -176,7 +176,6 @@ public class FeatureCollectionMatcher {
                     //////////////////////////////////////////////////////////////////////////
                     // Store the matches, to be used in the validation process
                     //////////////////////////////////////////////////////////////////////////
-//                    System.out.println("source: " + f1.getID() + " -- target: " + f2.getID());
                     matchList.storeMatch(f1, f2);
                 }
             }
@@ -202,17 +201,37 @@ public class FeatureCollectionMatcher {
                         if (ratio1 < 0.25 && ratio2 < 0.25) continue;
                         if (ratio2 < 0.5) continue;
                         matchMap.add(new Match(f1, f2, 2.0*ratio2-1.0));
+                        
+                        //////////////////////////////////////////////////////////////////////////
+                        // Store the matches, to be used in the validation process
+                        //////////////////////////////////////////////////////////////////////////
+                        matchList.storeMatch(f1, f2);
                     }
                 }
             }
         }
         
+        //////////////////////////////////////////////////////////////////////////
+        //	Check and store single objects
+        //////////////////////////////////////////////////////////////////////////
+        for (Feature f : source) {
+        	matchList.tryAddUnmatchedSourceFeature(f);
+        }
+        for (Feature f : target) {
+        	matchList.tryAddUnmatchedTargetFeature(f);
+        }
+        
 		//////////////////////////////////////////////////////////////////////////
 		// Store the matchList into SharedSpace
 		//////////////////////////////////////////////////////////////////////////
-        SharedSpace sharedSpace = SharedSpace.getInstance();
-        sharedSpace.storeMatchList(matchList);
-        
+		SharedSpace sharedSpace = SharedSpace.getInstance();
+		sharedSpace.storeMatchList(matchList);
+		
+//		System.out.println(String.format("Source layer: matched(%d) + unmatched(%d) = total(%d)", 
+//				matchList.sourceFeatureList.size(), matchList.unmatchedSourceFeatures.size(), matchList.sourceFeatureList.size() + matchList.unmatchedSourceFeatures.size()));
+//		System.out.println(String.format("Target layer: matched(%d) + unmatched(%d) = total(%d)", 
+//				matchList.targetFeatureList.size(), matchList.unmatchedTargetFeatures.size(), matchList.targetFeatureList.size() + matchList.unmatchedTargetFeatures.size()));
+		
         System.out.println("Direct Geometry Matching done in " + (System.currentTimeMillis()-t0) + " ms");
         return matchMap;
     }

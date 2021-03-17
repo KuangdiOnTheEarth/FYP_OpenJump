@@ -38,6 +38,12 @@ public class MatchList {
 	private final int INVALID      = 2;
 	private final int VALID        = 3;
 	
+	/**
+	 * The following fields are used for detecting omitted matches
+	 */
+	private ArrayList<Feature> unmatchedSourceFeatures = null; 
+	private ArrayList<Feature> unmatchedTargetFeatures = null; 
+	
 	
 	public MatchList() {
 		sourceFeatureIDs = new ArrayList<Integer>();
@@ -49,6 +55,8 @@ public class MatchList {
 		objectSimilarities = new ArrayList<Double>();
 		bufferRadiusList = new ArrayList<Double>();
 //		hMap = new HashMap<Integer, Integer>();
+		unmatchedSourceFeatures = new ArrayList<Feature>();
+		unmatchedTargetFeatures = new ArrayList<Feature>();
 	}
 	
 	public ArrayList<Feature> getSourceList() {
@@ -65,6 +73,45 @@ public class MatchList {
 	}
 	
 	public void storeMatch(Feature sourceFeature, Feature targetFeature) {
+		int sourceIndex = sourceFeatureList.indexOf(sourceFeature);
+		int targetIndex = targetFeatureList.indexOf(targetFeature);
+		if (sourceIndex < 0  && targetIndex < 0) {
+			// none of the pair has been stored
+			storeNonDuplicatedMatch(sourceFeature, targetFeature);
+		} else if (sourceIndex > 0) {
+			// multiple matches are assigned to this source feature, check: if this match has been stored, ignore it
+			boolean duplicated = false;
+			for (int i = sourceIndex; i < sourceFeatureList.size(); i++) {
+				if (sourceFeatureList.get(i) == sourceFeature && targetFeatureList.get(i) == targetFeature) {
+					duplicated = true;
+					break;
+				}
+			}
+			if (!duplicated) {
+				storeNonDuplicatedMatch(sourceFeature, targetFeature);
+//				System.out.println("\t ----------- source f multi-match");
+			}
+		} else if (targetIndex > 0) {
+			// multiple matches are assigned to this target feature, check: if this match has been stored, ignore it
+			boolean duplicated = false;
+			for (int i = targetIndex; i < targetFeatureList.size(); i++) {
+				if (sourceFeatureList.get(i) == sourceFeature && targetFeatureList.get(i) == targetFeature) {
+					duplicated = true;
+					break;
+				}
+			}
+			if (!duplicated) {
+				storeNonDuplicatedMatch(sourceFeature, targetFeature);
+//				System.out.println("\t target f multi-match -----------");
+			}
+		} else {
+			System.out.println("//////////////////////////");
+			System.out.println("// None of the cases is evoked in storeMatch(): " + sourceFeature.getID() + "--" + targetFeature.getID());
+			System.out.println("//////////////////////////");
+		}
+	}
+	
+	private void storeNonDuplicatedMatch(Feature sourceFeature, Feature targetFeature) {
 		sourceFeatureIDs.add(sourceFeature.getID());
 		targetFeatureIDs.add(targetFeature.getID());
 		sourceFeatureList.add(sourceFeature);
@@ -74,6 +121,18 @@ public class MatchList {
 		objectSimilarities.add(0.0); // object similarity will be considered only if context similarity lower than threshold, so it is initiated to 0
 		bufferRadiusList.add(0.0);
 //		hMap.put(sourceFeature.getID(), UNDISCOVERED);
+	}
+	
+	public void tryAddUnmatchedSourceFeature(Feature sourceFeature) {
+		if (!sourceFeatureList.contains(sourceFeature) && !unmatchedSourceFeatures.contains(sourceFeature)) {
+			unmatchedSourceFeatures.add(sourceFeature);
+		}
+	}
+	
+	public void tryAddUnmatchedTargetFeature(Feature targetFeature) {
+		if (!targetFeatureList.contains(targetFeature) && !unmatchedTargetFeatures.contains(targetFeature)) {
+			unmatchedTargetFeatures.add(targetFeature);
+		}
 	}
 	
 	public Feature getSourceFeatureByID(int id) {
@@ -261,4 +320,5 @@ public class MatchList {
 		}
 		return bufferRadiusList.get(i);
 	}
+
 }
