@@ -46,7 +46,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	private AbstractContextCalculator contextSimilarityCalculator;
 	
 	private String pluginName = "ValidateAbstractPlugIn";
-	private String contextSimilarityType = "sequence"; // star || sequence
+	private String contextSimilarityType = "star"; // star || sequence
 	private String objectSimilarityType = "overlay";
 	
 	public void initialize(PlugInContext context) throws Exception {
@@ -228,7 +228,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 //						Geometry buffer = sfCentroid.buffer(radius);
 	        // create lists to contain the surrounding objects
 			for (Feature f : sourceFeatures) {
-				if (buffer.intersects(f.getGeometry()) && f != sourceFeature && matchList.hasMatch(f)) {
+				if (buffer.intersects(f.getGeometry()) && f != sourceFeature && matchList.isSuitableSupportingMatch(f)) {
 					sourceSurr.add(f);
 				}
 			}

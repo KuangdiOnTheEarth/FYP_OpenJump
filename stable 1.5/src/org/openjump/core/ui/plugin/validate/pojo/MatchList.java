@@ -113,8 +113,17 @@ public class MatchList {
 		}
 	}
 	
-	public boolean hasMatch(Feature f) {
-		return sourceFeatureList.contains(f);
+	// return true if the input object is contained by a match, and that match is not invalid
+	public boolean isSuitableSupportingMatch(Feature f) {
+		int index = sourceFeatureList.indexOf(f);
+		if( index == -1) {
+			return false; // no match
+		} else {
+			if (validationStatuses.get(index) == INVALID) {
+				return false;
+			}
+			return true;
+		}
 	}
 	
 	public boolean supplementSingleMatch(Queue<Feature> queue) {
