@@ -2,10 +2,6 @@
 <workbench-state>
   <properties>
     <mapping>
-      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToGridPolicy - ENABLED</key>
-      <value class="java.lang.Boolean">false</value>
-    </mapping>
-    <mapping>
       <key class="java.lang.String">org.openjump.core.ui.SelectionStyllingOptionsPanel SELECTION_STYLE_POINT_FORM</key>
       <value class="java.lang.String">SQUARE</value>
     </mapping>
@@ -29,67 +25,16 @@
       <value class="java.lang.Integer">1440</value>
     </mapping>
     <mapping>
-      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - MAXIMIZED_KEY</key>
-      <value class="java.lang.Boolean">true</value>
-    </mapping>
-    <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - HEIGHT_KEY</key>
       <value class="java.lang.Integer">872</value>
-    </mapping>
-    <mapping>
-      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToVerticesPolicy - ENABLED</key>
-      <value class="java.lang.Boolean">false</value>
-    </mapping>
-    <mapping>
-      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_2</key>
-      <value class="java.lang.Integer">-1</value>
-    </mapping>
-    <mapping>
-      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_3</key>
-      <value class="java.lang.Integer">-1</value>
-    </mapping>
-    <mapping>
-      <key class="java.lang.String">org.openjump.core.ui.SelectionStyllingOptionsPanel SELECTION_STYLE_COLOR</key>
-      <value class="java.awt.Color">255, 255, 0, 255</value>
-    </mapping>
-    <mapping>
-      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_4</key>
-      <value class="java.lang.Integer">-1</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - VERTICAL_KEY</key>
       <value class="java.lang.Integer">23</value>
     </mapping>
     <mapping>
-      <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.PROJECTS</key>
-      <value class="java.util.LinkedHashSet" />
-    </mapping>
-    <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.datastore.ConnectionManager - CONNECTION DESCRIPTORS</key>
       <value class="java.util.ArrayList" />
-    </mapping>
-    <mapping>
-      <key class="java.lang.String">com.vividsolutions.jump.workbench.datasource.SaveDatasetAsPlugIn - LAST FORMAT</key>
-      <value class="java.lang.String">ESRI Shapefile</value>
-    </mapping>
-    <mapping>
-      <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.FILES</key>
-      <value class="java.util.LinkedHashSet">
-        <item class="java.lang.String">/Users/gungnir/Desktop/darling/Lee County/Building_Footprints.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/ArcGis/Las Cruces/Building_Footprints.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/statsilk/StatPlanet_USA_County/map/map.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/tapiquen/USA_Counties/USA_Counties.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/ArcGis/Prince George/Building_Outlines.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/darling/planet_-82.314_26.26_0542a81a-shp/shape/buildings.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Pcince_1_ArcGIS.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Prince_1_bbb.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Pcince_1_arc.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/bbbike/Prince George/shape/buildings.shp</item>
-      </value>
-    </mapping>
-    <mapping>
-      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_1</key>
-      <value class="java.lang.Integer">-1</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">org.openjump.core.ui.SelectionStyllingOptionsPanel SELECTION_STYLE_POINT_SIZE</key>
@@ -118,6 +63,61 @@
     <mapping>
       <key class="java.lang.String">class com.vividsolutions.jump.workbench.ui.snap.GridRenderer - ENABLED</key>
       <value class="java.lang.Boolean">false</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToGridPolicy - ENABLED</key>
+      <value class="java.lang.Boolean">false</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - MAXIMIZED_KEY</key>
+      <value class="java.lang.Boolean">true</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToVerticesPolicy - ENABLED</key>
+      <value class="java.lang.Boolean">false</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_2</key>
+      <value class="java.lang.Integer">-1</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_3</key>
+      <value class="java.lang.Integer">-1</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.SelectionStyllingOptionsPanel SELECTION_STYLE_COLOR</key>
+      <value class="java.awt.Color">255, 255, 0, 255</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_4</key>
+      <value class="java.lang.Integer">-1</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.PROJECTS</key>
+      <value class="java.util.LinkedHashSet" />
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.datasource.SaveDatasetAsPlugIn - LAST FORMAT</key>
+      <value class="java.lang.String">ESRI Shapefile</value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.FILES</key>
+      <value class="java.util.LinkedHashSet">
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/statsilk/StatPlanet_USA_County/map/map.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/tapiquen/USA_Counties/USA_Counties.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/ArcGis/Prince George/Building_Outlines.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/darling/planet_-82.314_26.26_0542a81a-shp/shape/buildings.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Pcince_1_ArcGIS.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Prince_1_bbb.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Pcince_1_arc.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/bbbike/Prince George/shape/buildings.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_1_arc.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_1_bbb.shp</item>
+      </value>
+    </mapping>
+    <mapping>
+      <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - STATUSPANEL_DIVIDER_LOCATION_1</key>
+      <value class="java.lang.Integer">-1</value>
     </mapping>
   </properties>
 </workbench-state>

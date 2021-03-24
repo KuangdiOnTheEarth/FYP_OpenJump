@@ -2,6 +2,7 @@ package org.openjump.core.ui.plugin.validate.pojo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Queue;
 
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
@@ -110,6 +111,24 @@ public class MatchList {
 			System.out.println("// None of the cases is evoked in storeMatch(): " + sourceFeature.getID() + "--" + targetFeature.getID());
 			System.out.println("//////////////////////////");
 		}
+	}
+	
+	public boolean hasMatch(Feature f) {
+		return sourceFeatureList.contains(f);
+	}
+	
+	public boolean supplementSingleMatch(Queue<Feature> queue) {
+		for (int i = 0 ; i < validationStatuses.size(); i++) {
+//			if (validationStatuses.get(i) == UNDISCOVERED) {
+			if (shouldBeQueued(sourceFeatureList.get(i))) {
+				queue.offer(sourceFeatureList.get(i));
+//				setAsInQueue(sourceFeatureList.get(i));
+				validationStatuses.set(i, INQUEUE);
+				System.out.println("Supplement Match: " + sourceFeatureList.get(i).getID());
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private void storeNonDuplicatedMatch(Feature sourceFeature, Feature targetFeature) {

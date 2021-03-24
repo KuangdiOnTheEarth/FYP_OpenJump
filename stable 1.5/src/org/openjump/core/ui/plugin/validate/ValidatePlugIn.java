@@ -119,6 +119,16 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 				backtrack(sourceFeature);
 			}
 			
+			if (queue.isEmpty()) {
+				int c = 0;
+				for (Feature f : sourceFeatures) {
+					if (matchList.shouldBeQueued(f)) {
+						c++;
+					}
+				}
+				System.out.println("Current UNDISCOVERED objects: " + c);
+				matchList.supplementSingleMatch(queue);
+			}
 		}
 		
 		///////////////////////////////////////////
@@ -218,7 +228,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 //						Geometry buffer = sfCentroid.buffer(radius);
 	        // create lists to contain the surrounding objects
 			for (Feature f : sourceFeatures) {
-				if (buffer.intersects(f.getGeometry()) && f != sourceFeature) {
+				if (buffer.intersects(f.getGeometry()) && f != sourceFeature && matchList.hasMatch(f)) {
 					sourceSurr.add(f);
 				}
 			}
