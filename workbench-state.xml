@@ -103,8 +103,6 @@
     <mapping>
       <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.FILES</key>
       <value class="java.util.LinkedHashSet">
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/statsilk/StatPlanet_USA_County/map/map.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/tapiquen/USA_Counties/USA_Counties.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/ArcGis/Prince George/Building_Outlines.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/darling/planet_-82.314_26.26_0542a81a-shp/shape/buildings.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Pcince_1_ArcGIS.shp</item>
@@ -113,6 +111,8 @@
         <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/bbbike/Prince George/shape/buildings.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_1_arc.shp</item>
         <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_1_bbb.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_2_arc.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_2_bbb.shp</item>
       </value>
     </mapping>
     <mapping>

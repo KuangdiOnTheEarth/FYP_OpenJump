@@ -39,12 +39,13 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	private final String T_Context_Measure = "context similarity measure";
 	private final String T_Threshold = "validation threshold";
 	private final String T_Context_Weight = "weight of context similarity";
+	private final String T_Context_NUM = "mininal neighbouring objects";
 	
 	private double VALID_THRESHOLD = 0.8; // if confidence level exceeds or equal to threshold, the match is considered as valid
 	private double CONTEXT_WEIGHT = 0.8;
 	private String CONTEXT_MEASURE = "";
 	
-	private final int MIN_SURR_OBJ_NEEDED = 5; // the minimal number of surrounding objects needed
+	private int MIN_SURR_OBJ_NEEDED = 5; // the minimal number of surrounding objects needed
 	private final double BUFFER_INC_RATE = 1.1; // if too less surrounding object is found, the radius of buffer will increase at this rate
 	
 	private SharedSpace sharedSpace;
@@ -96,14 +97,16 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
         contextSimilarityMeasures.add("angle difference");
         contextSimilarityMeasures.add("sequence order");
         dialog.addComboBox(T_Context_Measure, contextSimilarityMeasures.get(0), contextSimilarityMeasures, null);
-        dialog.addPositiveDoubleField(T_Threshold, this.VALID_THRESHOLD, 3, null);
+        dialog.addPositiveDoubleField(T_Threshold, this.VALID_THRESHOLD, 4, null);
         dialog.addPositiveDoubleField(T_Context_Weight, this.CONTEXT_WEIGHT, 4);
+        dialog.addPositiveIntegerField(T_Context_NUM, MIN_SURR_OBJ_NEEDED, 4);
 	  }
 
     private void getDialogValues(MultiInputDialog dialog){
         this.VALID_THRESHOLD = dialog.getDouble(T_Threshold);
         this.CONTEXT_WEIGHT = dialog.getDouble(T_Context_Weight);
         this.CONTEXT_MEASURE = dialog.getText(T_Context_Measure);
+        this.MIN_SURR_OBJ_NEEDED = dialog.getInteger(T_Context_NUM);
 	  }
     
     
