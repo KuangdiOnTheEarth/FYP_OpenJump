@@ -97,6 +97,13 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 		if (sourceFeature == null) {
 			System.out.println("No feature of ID = " + featureID + " can be found");
 		}
+		
+		System.out.println("---------------- Scrutinizing the validation process for id = " + sourceFeature.getID() + " --------------");
+		System.out.println("Validation Result: " + (matchList.getConfidenceLevel(sourceFeature)>=matchList.getValidThreshold()?"Valid":"Invalid"));
+		System.out.println("Confidence Level: " + matchList.getConfidenceLevel(sourceFeature) + " ( threshold: " + matchList.getValidThreshold() + " )");
+		System.out.println("Object Similarity: " + matchList.getObjectSimilarity(sourceFeature) + " ( weight: " + (1-matchList.getContextWeight()) + " )"); 
+		System.out.println("Context Similarity: " + matchList.getContextSimilarity(sourceFeature) + " ( weight: " + matchList.getContextWeight() + " )"); 
+
 		Geometry sfGeom = sourceFeature.getGeometry();
 		Geometry buffer = sfGeom.buffer(matchList.getBufferRadius(sourceFeature));
 		
@@ -113,7 +120,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
         // add the buffer into feature collection
         Feature bufferFeature = sourceFeature.clone(false);
         bufferFeature.setGeometry(buffer);
-        surrColl.add(bufferFeature);
+//        surrColl.add(bufferFeature);
         
         // create lists to contain the surrounding objects in source layer
         ArrayList<Feature> sourceSurr = sharedSpace.getSupportingRelations().getSupportingFeaturesOf(sourceFeature);

@@ -10,6 +10,7 @@ import org.openjump.core.ui.plugin.AbstractUiPlugIn;
 import org.openjump.core.ui.plugin.validate.contextcalculator.AbstractContextCalculator;
 import org.openjump.core.ui.plugin.validate.contextcalculator.RouteContextCalculator;
 import org.openjump.core.ui.plugin.validate.contextcalculator.StarContextCalculator;
+import org.openjump.core.ui.plugin.validate.objectcalculator.AbstractObjectCalculator;
 import org.openjump.core.ui.plugin.validate.pojo.AntiClockwiseSequence;
 import org.openjump.core.ui.plugin.validate.pojo.MatchList;
 import org.openjump.core.ui.plugin.validate.pojo.SupportingRelations;
@@ -44,6 +45,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 //	private final double bufferRadius = 0.5;
 	private boolean VISUALIZE_VALIDATION_PROCESS = false;
 	private AbstractContextCalculator contextSimilarityCalculator;
+	private AbstractObjectCalculator objectSimilarityCalculator;
 	
 	private String pluginName = "ValidateAbstractPlugIn";
 	private String contextSimilarityType = "star"; // star || sequence
@@ -73,8 +75,10 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	public void run(TaskMonitor monitor, PlugInContext context) throws Exception {
 		sharedSpace.setSimilarityType(contextSimilarityType, objectSimilarityType);
 		contextSimilarityCalculator = sharedSpace.getContextCalculator();
+		objectSimilarityCalculator = sharedSpace.getObjectCalculator();
 		this.matchList = sharedSpace.getMatchList();
 		matchList.clear();
+		matchList.setValidThreshold(VALID_THRESHOLD);
 		System.gc();
 		System.out.println("\n------\nStart ValidationPlugIn ...\n------");
 		
@@ -111,8 +115,10 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			// calculate context similarity
 			double contextSimilarity = calContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr, false);
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
+			double objectSimilarity = objectSimilarityCalculator.calObjectSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature));
+			matchList.setObjectSimilarity(sourceFeature, objectSimilarity);
 			// backtrack if the match is considered as invalid
-			if (contextSimilarity >= VALID_THRESHOLD) {
+			if (matchList.getConfidenceLevel(sourceFeature) >= VALID_THRESHOLD) {
 				matchList.setAsValid(sourceFeature);
 			} else {
 				matchList.setAsInvalid(sourceFeature);
@@ -156,10 +162,9 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 				ArrayList<Feature> sourceSurr = findSurroundingMatch(singleF, sourceFeatures, null, false, false);
 				// calculate context similarity
 				double contextSimilarity = calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, false);
-				double confidenceLevel = contextSimilarity;
-				if (confidenceLevel < VALID_THRESHOLD) {
-					// confidenceLevel + object similarity
-				}
+				double objectSimilarity = objectSimilarityCalculator.calObjectSimilarity(singleF, potentialMatchedObject);
+				double confidenceLevel = contextSimilarity*matchList.getContextWeight() + objectSimilarity*(1-matchList.getContextWeight());
+
 				if (confidenceLevel >= VALID_THRESHOLD) {
 					matchList.storeMatch(singleF, potentialMatchedObject);
 					matchList.setAsNew(singleF);
@@ -167,6 +172,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 					findSurroundingMatch(singleF, sourceFeatures, null, true, true);
 					calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, true);
 					matchList.setContextSimilarity(singleF, contextSimilarity);
+					matchList.setObjectSimilarity(singleF, objectSimilarity);
 				}
 			}
 		}
@@ -295,7 +301,9 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 						double preCS = matchList.getContextSimilarity(f); // context similarity
 						double preOS = matchList.getObjectSimilarity(f); // object similarity
 						double preCL = matchList.getContextSimilarity(f); // confidence level
-						double contextSimilarity = calContextSimilarity(f, matchList.getMatchedTargetFeature(f), null, true);
+						// find the surrounding objects again, this time ignore the new invalid feature
+						ArrayList<Feature> sourceSurr = findSurroundingMatch(f, matchList.getSourceList(), null, true, false);
+						double contextSimilarity = calContextSimilarity(f, matchList.getMatchedTargetFeature(f), sourceSurr, true);
 						matchList.setContextSimilarity(f, contextSimilarity);
 						if (matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
 							System.out.println(String.format("\t\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;%.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
@@ -308,6 +316,28 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 				}
 			}
 			currentLayerQueue = nextLayerQueue;
+		}
+	}
+	
+	
+	private void backtrackRecursion(Feature invalidFeature) {
+		ArrayList<Feature> supports = supportingRelations.getFeaturesSupportedBy(invalidFeature);
+		for (Feature f : supports) {
+			double preCS = matchList.getContextSimilarity(f); // context similarity
+			double preOS = matchList.getObjectSimilarity(f); // object similarity
+			double preCL = matchList.getContextSimilarity(f); // confidence level
+			
+			ArrayList<Feature> sourceSurr = findSurroundingMatch(f, matchList.getSourceList(), null, true, false);
+			double contextSimilarity = calContextSimilarity(f, matchList.getMatchedTargetFeature(f), sourceSurr, true);
+			matchList.setContextSimilarity(f, contextSimilarity);
+			
+			if (matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
+				System.out.println(String.format("\t\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;%.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
+				matchList.setAsInvalid(f);
+				backtrackRecursion(f);
+			} else {
+				System.out.println(String.format("\t\t%d: %.4f --> %.4f", f.getID(), preCS, matchList.getContextSimilarity(f)));
+			}
 		}
 	}
 	

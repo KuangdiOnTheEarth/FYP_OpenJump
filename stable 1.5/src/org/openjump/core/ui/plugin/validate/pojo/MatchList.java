@@ -18,7 +18,8 @@ import javafx.util.Pair;
  */
 public class MatchList {
 	
-	private final double CONTEXT_SIMILARITY_WEIGHT = 1;
+	private final double CONTEXT_SIMILARITY_WEIGHT = 0;
+	private double VALID_THRESHOLD = 0;
 	
 	private ArrayList<Integer> sourceFeatureIDs = null;
 	private ArrayList<Integer> targetFeatureIDs = null;
@@ -287,6 +288,7 @@ public class MatchList {
 		}
 		contextSimilarties.set(i, similarity);
 	}
+	
 	public void setObjectSimilarity(Feature srcFeature, Double similarity) {
 		int i = sourceFeatureList.indexOf(srcFeature);
 		if (i == -1) {
@@ -327,6 +329,13 @@ public class MatchList {
 		return CONTEXT_SIMILARITY_WEIGHT;
 	}
 	
+	public double getValidThreshold() {
+		return VALID_THRESHOLD;
+	}
+	
+	public void setValidThreshold(Double t) {
+		this.VALID_THRESHOLD = t;
+	}
 	/**
 	 * 
 	 * @return a set of all VALID matches and a set of all INVALID matches

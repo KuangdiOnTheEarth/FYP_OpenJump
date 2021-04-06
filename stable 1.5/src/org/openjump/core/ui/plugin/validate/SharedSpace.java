@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.openjump.core.ui.plugin.validate.contextcalculator.AbstractContextCalculator;
 import org.openjump.core.ui.plugin.validate.contextcalculator.RouteContextCalculator;
 import org.openjump.core.ui.plugin.validate.contextcalculator.StarContextCalculator;
+import org.openjump.core.ui.plugin.validate.objectcalculator.AbstractObjectCalculator;
+import org.openjump.core.ui.plugin.validate.objectcalculator.OverlapObjectCalculator;
 import org.openjump.core.ui.plugin.validate.pojo.MatchList;
 import org.openjump.core.ui.plugin.validate.pojo.SupportingRelations;
 
@@ -141,6 +143,14 @@ public class SharedSpace {
 		
 		else {
 			return new StarContextCalculator(this.STAR_DEGREE_RANGE);
+		}
+	}
+	
+	public AbstractObjectCalculator getObjectCalculator() {
+		if (currentObjectSimilarityType == OS_OVERLAY) {
+			return new OverlapObjectCalculator();
+		} else {
+			return new OverlapObjectCalculator();
 		}
 	}
 	
