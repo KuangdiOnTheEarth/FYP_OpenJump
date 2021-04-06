@@ -18,7 +18,7 @@ import javafx.util.Pair;
  */
 public class MatchList {
 	
-	private final double CONTEXT_SIMILARITY_WEIGHT = 0.8;
+	private double CONTEXT_SIMILARITY_WEIGHT = 0.8;
 	private double VALID_THRESHOLD = 0;
 	
 	private ArrayList<Integer> sourceFeatureIDs = null;
@@ -327,6 +327,10 @@ public class MatchList {
 	
 	public double getContextWeight() {
 		return CONTEXT_SIMILARITY_WEIGHT;
+	}
+	
+	public void setContextWeight(Double w) {
+		this.CONTEXT_SIMILARITY_WEIGHT = w;
 	}
 	
 	public double getValidThreshold() {

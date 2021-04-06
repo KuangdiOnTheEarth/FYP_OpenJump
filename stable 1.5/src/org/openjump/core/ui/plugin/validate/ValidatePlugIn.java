@@ -28,13 +28,22 @@ import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
+import com.vividsolutions.jump.workbench.ui.GUIUtil;
+import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
 import javafx.util.Pair;
 
 public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
-	private final double VALID_THRESHOLD = 0.8; // if confidence level exceeds or equal to threshold, the match is considered as valid
+	private final String T_Context_Measure = "context similarity measure";
+	private final String T_Threshold = "validation threshold";
+	private final String T_Context_Weight = "weight of context similarity";
+	
+	private double VALID_THRESHOLD = 0.8; // if confidence level exceeds or equal to threshold, the match is considered as valid
+	private double CONTEXT_WEIGHT = 0.8;
+	private String CONTEXT_MEASURE = "";
+	
 	private final int MIN_SURR_OBJ_NEEDED = 5; // the minimal number of surrounding objects needed
 	private final double BUFFER_INC_RATE = 1.1; // if too less surrounding object is found, the radius of buffer will increase at this rate
 	
@@ -70,17 +79,56 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
                         .add(checkFactory.createTaskWindowMustBeActiveCheck());
     }
 	
+	public boolean execute(PlugInContext context) throws Exception{
+	    this.reportNothingToUndoYet(context);
+	    MultiInputDialog dialog = new MultiInputDialog(
+	            context.getWorkbenchFrame(), getName(), true);
+        this.setDialogValues(dialog, context);
+        GUIUtil.centreOnWindow(dialog);
+        dialog.setVisible(true);
+        if (! dialog.wasOKPressed()) { return false; }
+        this.getDialogValues(dialog);
+        return true;
+	}
+	
+    private void setDialogValues(MultiInputDialog dialog, PlugInContext context){
+    	ArrayList<String> contextSimilarityMeasures = new ArrayList<String>();
+        contextSimilarityMeasures.add("angle difference");
+        contextSimilarityMeasures.add("sequence order");
+        dialog.addComboBox(T_Context_Measure, contextSimilarityMeasures.get(0), contextSimilarityMeasures, null);
+        dialog.addPositiveDoubleField(T_Threshold, this.VALID_THRESHOLD, 3, null);
+        dialog.addPositiveDoubleField(T_Context_Weight, this.CONTEXT_WEIGHT, 4);
+	  }
+
+    private void getDialogValues(MultiInputDialog dialog){
+        this.VALID_THRESHOLD = dialog.getDouble(T_Threshold);
+        this.CONTEXT_WEIGHT = dialog.getDouble(T_Context_Weight);
+        this.CONTEXT_MEASURE = dialog.getText(T_Context_Measure);
+	  }
+    
+    
+    
+	
 
 	@Override
 	public void run(TaskMonitor monitor, PlugInContext context) throws Exception {
+		if (CONTEXT_MEASURE == "angle difference") {
+			this.contextSimilarityType = "star";
+		} else if (CONTEXT_MEASURE == "sequence order") {
+			this.contextSimilarityType = "sequence";
+		}
 		sharedSpace.setSimilarityType(contextSimilarityType, objectSimilarityType);
 		contextSimilarityCalculator = sharedSpace.getContextCalculator();
 		objectSimilarityCalculator = sharedSpace.getObjectCalculator();
+		
 		this.matchList = sharedSpace.getMatchList();
 		matchList.clear();
 		matchList.setValidThreshold(VALID_THRESHOLD);
+		matchList.setContextWeight(CONTEXT_WEIGHT);
+		
 		System.gc();
 		System.out.println("\n------\nStart ValidationPlugIn ...\n------");
+		System.out.println("Validation Threshold: " + VALID_THRESHOLD + "; Context Similarity Weight: " + CONTEXT_WEIGHT + "; Measure: " + contextSimilarityType);
 		
 		Queue<Feature> queue = new LinkedList<Feature>(); // a queue storing matches waiting to be validated
 		Random random = new  Random();
