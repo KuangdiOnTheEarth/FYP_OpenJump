@@ -18,7 +18,7 @@ import javafx.util.Pair;
  */
 public class MatchList {
 	
-	private final double CONTEXT_SIMILARITY_WEIGHT = 0;
+	private final double CONTEXT_SIMILARITY_WEIGHT = 0.8;
 	private double VALID_THRESHOLD = 0;
 	
 	private ArrayList<Integer> sourceFeatureIDs = null;

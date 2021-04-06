@@ -91,6 +91,8 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
         monitor.allowCancellationRequests();
 	    System.gc();
 	    matchList = sharedSpace.getMatchList();
+	    
+	    System.out.println("\n\n");
 
 		// create a buffer surrounding the being checked feature
 		Feature sourceFeature = matchList.getSourceFeatureByID(featureID);
@@ -100,10 +102,10 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 		
 		System.out.println("---------------- Scrutinizing the validation process for id = " + sourceFeature.getID() + " --------------");
 		System.out.println("Validation Result: " + (matchList.getConfidenceLevel(sourceFeature)>=matchList.getValidThreshold()?"Valid":"Invalid"));
-		System.out.println("Confidence Level: " + matchList.getConfidenceLevel(sourceFeature) + " ( threshold: " + matchList.getValidThreshold() + " )");
-		System.out.println("Object Similarity: " + matchList.getObjectSimilarity(sourceFeature) + " ( weight: " + (1-matchList.getContextWeight()) + " )"); 
-		System.out.println("Context Similarity: " + matchList.getContextSimilarity(sourceFeature) + " ( weight: " + matchList.getContextWeight() + " )"); 
-
+		System.out.println("Confidence Level: " + String.format("%.4f", matchList.getConfidenceLevel(sourceFeature)) + " ( threshold: " + matchList.getValidThreshold() + " )");
+		System.out.println("Context Similarity: " + String.format("%.4f", matchList.getContextSimilarity(sourceFeature)) + " ( weight: " + matchList.getContextWeight() + " )"); 
+		System.out.println("Object Similarity: " + String.format("%.4f", matchList.getObjectSimilarity(sourceFeature)) + " ( weight: " + (1-matchList.getContextWeight()) + " )"); 
+		System.out.println("Details: ");
 		Geometry sfGeom = sourceFeature.getGeometry();
 		Geometry buffer = sfGeom.buffer(matchList.getBufferRadius(sourceFeature));
 		

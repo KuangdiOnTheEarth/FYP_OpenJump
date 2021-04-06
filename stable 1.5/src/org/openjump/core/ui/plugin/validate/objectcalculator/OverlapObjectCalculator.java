@@ -12,8 +12,8 @@ public class OverlapObjectCalculator extends AbstractObjectCalculator{
 		Geometry f1Geom = f1.getGeometry(); 
 		Geometry f2Geom = f2.getGeometry(); 
 		Geometry overlap = f1Geom.intersection(f2Geom);
-		double baseArea = Math.min(f1Geom.getArea(), f2Geom.getArea());
-		return overlap.getArea() / baseArea;
+		double baseArea = f1Geom.getArea() + f2Geom.getArea();
+		return (2 * overlap.getArea()) / baseArea;
 	}
 
 }

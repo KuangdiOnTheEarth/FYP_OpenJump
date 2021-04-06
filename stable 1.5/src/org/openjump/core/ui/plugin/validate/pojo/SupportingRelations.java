@@ -44,22 +44,49 @@ public class SupportingRelations {
 //			System.out.println("No supporting relation need to be recorded for id = " + beSupportedFeature.getID());
 			return;
 		}
+		
+		// clean the previous supporting relation (let others forget they have support this match)
+		int i = features.indexOf(beSupportedFeature);
+		if (i == -1) {
+			System.out.println("--SupportingRelations-- the center feature is not found in record id = " + beSupportedFeature.getID());
+		}
+		ArrayList<Feature> nn = (ArrayList<Feature>)beSupportedBy.get(i).clone();
+		
+		
+		// set new supporting relation
 		if (!omittedMatch) {
+			for (Feature f : nn) {
+				if (!ss.contains(f)) { // if the context has been changed, let the origin context forget they have supported this match
+					int index = features.indexOf(f);
+					if (index == -1) {
+						System.out.println("--SupportingRelations-- not found record of id = " + f.getID());
+					} else {
+						ArrayList<Feature> newSupports = new ArrayList<Feature>();
+						for (Feature sup : supports.get(index)) {
+							if ( sup != beSupportedFeature) {
+								newSupports.add(sup);
+							} else {
+//								System.out.println("remove one");
+							}
+						}
+						supports.set(index, newSupports);
+					}
+				}
+			}
 			for (Feature f : ss) {
 				int index = features.indexOf(f);
 				if (index == -1) {
 					System.out.println("--SupportingRelations-- not found record of id = " + f.getID());
 				} else {
-					supports.get(index).add(beSupportedFeature);
+					if (!supports.get(index).contains(beSupportedFeature)) {
+						supports.get(index).add(beSupportedFeature);
+					}
 				}
 			}
 		}
 		
-		int index = features.indexOf(beSupportedFeature);
-		if (index == -1) {
-			System.out.println("--SupportingRelations-- the center feature is not found in record id = " + beSupportedFeature.getID());
-		}
-		beSupportedBy.set(index, ss);
+
+		beSupportedBy.set(i, ss);
 	}
 	
 	public ArrayList<Feature> getFeaturesSupportedBy(Feature f) {

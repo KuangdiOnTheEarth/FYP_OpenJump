@@ -122,7 +122,8 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 				matchList.setAsValid(sourceFeature);
 			} else {
 				matchList.setAsInvalid(sourceFeature);
-				backtrack(sourceFeature);
+//				backtrack(sourceFeature);
+				backtrackRecursion(sourceFeature, "");
 			}
 			
 			if (queue.isEmpty()) {
@@ -320,8 +321,11 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	}
 	
 	
-	private void backtrackRecursion(Feature invalidFeature) {
+	private void backtrackRecursion(Feature invalidFeature, String pre) {
+		System.out.println(pre + "start backtrack " + invalidFeature.getID());
+		pre += "\t";
 		ArrayList<Feature> supports = supportingRelations.getFeaturesSupportedBy(invalidFeature);
+		int round = 1;
 		for (Feature f : supports) {
 			double preCS = matchList.getContextSimilarity(f); // context similarity
 			double preOS = matchList.getObjectSimilarity(f); // object similarity
@@ -331,13 +335,17 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			double contextSimilarity = calContextSimilarity(f, matchList.getMatchedTargetFeature(f), sourceSurr, true);
 			matchList.setContextSimilarity(f, contextSimilarity);
 			
-			if (matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
-				System.out.println(String.format("\t\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;%.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
+			if (preCL >= VALID_THRESHOLD && matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
+//				System.out.println(String.format("\t\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;%.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
+				System.out.println(pre + round + " Discover new invalid " + f.getID() + "  (" + preCL + "-->"+ matchList.getConfidenceLevel(f));
 				matchList.setAsInvalid(f);
-				backtrackRecursion(f);
-			} else {
-				System.out.println(String.format("\t\t%d: %.4f --> %.4f", f.getID(), preCS, matchList.getContextSimilarity(f)));
+				backtrackRecursion(f, pre);
+			} else if (preCL < VALID_THRESHOLD && matchList.getConfidenceLevel(f) >= VALID_THRESHOLD) {
+				System.out.println(pre + round + " Recover as valid " + f.getID() + "  (" + preCL + "-->"+ matchList.getConfidenceLevel(f));
+				matchList.setAsValid(f);
+//				backtrackRecursion(f, pre);
 			}
+			round++;
 		}
 	}
 	

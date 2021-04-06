@@ -22,15 +22,15 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - WIDTH_KEY</key>
-      <value class="java.lang.Integer">1440</value>
+      <value class="java.lang.Integer">741</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - HEIGHT_KEY</key>
-      <value class="java.lang.Integer">872</value>
+      <value class="java.lang.Integer">741</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - VERTICAL_KEY</key>
-      <value class="java.lang.Integer">23</value>
+      <value class="java.lang.Integer">154</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.datastore.ConnectionManager - CONNECTION DESCRIPTORS</key>
@@ -70,7 +70,7 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - MAXIMIZED_KEY</key>
-      <value class="java.lang.Boolean">true</value>
+      <value class="java.lang.Boolean">false</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.snap.SnapToVerticesPolicy - ENABLED</key>
