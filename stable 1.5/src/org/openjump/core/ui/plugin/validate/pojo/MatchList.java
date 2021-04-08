@@ -69,9 +69,10 @@ public class MatchList {
 	public void clear() {
 		for (int i = 0; i < sourceFeatureList.size(); i++) {
 			contextSimilarties.set(i, 1.0);
-			objectSimilarities.set(i, 1.0);
+			objectSimilarities.set(i, 0.0);
 			validationStatuses.set(i, UNDISCOVERED);
 		}
+		
 //		hMap.clear();
 	}
 	
@@ -81,7 +82,7 @@ public class MatchList {
 		if (sourceIndex < 0  && targetIndex < 0) {
 			// none of the pair has been stored
 			storeNonDuplicatedMatch(sourceFeature, targetFeature);
-		} else if (sourceIndex > 0) {
+		} else if (sourceIndex >= 0) {
 			// multiple matches are assigned to this source feature, check: if this match has been stored, ignore it
 			boolean duplicated = false;
 			for (int i = sourceIndex; i < sourceFeatureList.size(); i++) {
@@ -94,7 +95,7 @@ public class MatchList {
 				storeNonDuplicatedMatch(sourceFeature, targetFeature);
 //				System.out.println("\t ----------- source f multi-match");
 			}
-		} else if (targetIndex > 0) {
+		} else if (targetIndex >= 0) {
 			// multiple matches are assigned to this target feature, check: if this match has been stored, ignore it
 			boolean duplicated = false;
 			for (int i = targetIndex; i < targetFeatureList.size(); i++) {
@@ -352,9 +353,12 @@ public class MatchList {
 		invalidColl = new FeatureDataset(fs);
 		for (int i = 0; i < sourceFeatureList.size(); i++) {
 			if (validationStatuses.get(i) == VALID) {
-				validColl.add(sourceFeatureList.get(i).clone(false));
+				validColl.add(sourceFeatureList.get(i).clone(true));
 			} else if (validationStatuses.get(i) == INVALID) {
-				invalidColl.add(sourceFeatureList.get(i).clone(false));
+				invalidColl.add(sourceFeatureList.get(i).clone(true));
+			} else {
+				if (validationStatuses.get(i) != NEW)
+					System.out.println("Neither Valid nor Invalid: " + validationStatuses.get(i));
 			}
 		}
 		return new Pair<FeatureCollection, FeatureCollection>(validColl, invalidColl);
@@ -372,8 +376,8 @@ public class MatchList {
 		targetColl = new FeatureDataset(fs);
 		for (int i = 0; i < sourceFeatureList.size(); i++) {
 			if (validationStatuses.get(i) == NEW) {
-				sourceColl.add(sourceFeatureList.get(i).clone(false));
-				targetColl.add(targetFeatureList.get(i).clone(false));
+				sourceColl.add(sourceFeatureList.get(i).clone(true));
+				targetColl.add(targetFeatureList.get(i).clone(true));
 			}
 		}
 		return new Pair<FeatureCollection, FeatureCollection>(sourceColl, targetColl);

@@ -17,6 +17,7 @@ public class StarContextCalculator extends AbstractContextCalculator{
 	public StarContextCalculator(int degreeSectionRange) {
 		this.numSections = 360 / degreeSectionRange;
 		this.degreeRange = degreeSectionRange;
+		System.out.println("Angle-Diffrence Context: angle tolerance is " + this.degreeRange);
 	}
 	
 	public double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr, boolean visualize) {
@@ -28,7 +29,8 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		}
 		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
 		for (Feature f : srcSurr) {
-			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
+//			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
+			if (f != sourceFeature) { // ignore the invalid matches & single objects
 				sourceSurr.add(f);
 			}
 		}
@@ -67,10 +69,15 @@ public class StarContextCalculator extends AbstractContextCalculator{
 			}
 			if (degreeDiff <= degreeRange) {
 				sameSectionCount++;
+			} else {
+				System.out.println("------- Out of range! " + degreeDiff + " exceeds " + degreeRange);
 			}
 		}
 		
 		double res = (double)sameSectionCount / (double)numSurroundingObjects;
+		if (!(res > 1) && !(res <= 1)) {
+			System.out.println(sameSectionCount + " / " + numSurroundingObjects + " = " + res);
+		}
 		return res;
 	}
 	
@@ -84,7 +91,8 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		}
 		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
 		for (Feature f : srcSurr) {
-			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
+//			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
+			if (f != sourceFeature) { // ignore the invalid matches & single objects
 				sourceSurr.add(f);
 			}
 		}
@@ -162,7 +170,7 @@ public class StarContextCalculator extends AbstractContextCalculator{
 
 		// print invalid supporting matches
 		if (invalidSourceFeatures.size() > 0) {
-			System.out.println("A match with degree difference smaller than " + sharedSpace.STAR_DEGREE_RANGE + " is considered as valid supporting match");
+			System.out.println("A match with degree difference smaller than " + sharedSpace.ANGLE_TOLERANCE + " is considered as valid supporting match");
 			System.out.println("The following surrounding matches indicates a low context similarity:");
 			for (int i = 0; i < invalidSourceFeatures.size(); i++) {
 				double degreeDiff = Math.abs(sourceDegrees.get(invalidFeatureIndices.get(i)) - targetDegrees.get(invalidFeatureIndices.get(i)));

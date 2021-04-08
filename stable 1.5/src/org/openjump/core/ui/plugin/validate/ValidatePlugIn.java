@@ -40,10 +40,12 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	private final String T_Threshold = "validation threshold";
 	private final String T_Context_Weight = "weight of context similarity";
 	private final String T_Context_NUM = "mininal neighbouring objects";
+	private final String T_Angle_Tolerance = "angle tolerance";
 	
 	private double VALID_THRESHOLD = 0.8; // if confidence level exceeds or equal to threshold, the match is considered as valid
 	private double CONTEXT_WEIGHT = 0.8;
 	private String CONTEXT_MEASURE = "";
+	private int ANGLE_TOLERANCE = 5;
 	
 	private int MIN_SURR_OBJ_NEEDED = 5; // the minimal number of surrounding objects needed
 	private final double BUFFER_INC_RATE = 1.1; // if too less surrounding object is found, the radius of buffer will increase at this rate
@@ -100,6 +102,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
         dialog.addPositiveDoubleField(T_Threshold, this.VALID_THRESHOLD, 4, null);
         dialog.addPositiveDoubleField(T_Context_Weight, this.CONTEXT_WEIGHT, 4);
         dialog.addPositiveIntegerField(T_Context_NUM, MIN_SURR_OBJ_NEEDED, 4);
+        dialog.addPositiveIntegerField(T_Angle_Tolerance, this.ANGLE_TOLERANCE, 4, null);
 	  }
 
     private void getDialogValues(MultiInputDialog dialog){
@@ -107,6 +110,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
         this.CONTEXT_WEIGHT = dialog.getDouble(T_Context_Weight);
         this.CONTEXT_MEASURE = dialog.getText(T_Context_Measure);
         this.MIN_SURR_OBJ_NEEDED = dialog.getInteger(T_Context_NUM);
+        this.ANGLE_TOLERANCE = dialog.getInteger(T_Angle_Tolerance);
 	  }
     
     
@@ -121,6 +125,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			this.contextSimilarityType = "sequence";
 		}
 		sharedSpace.setSimilarityType(contextSimilarityType, objectSimilarityType);
+		sharedSpace.setAngleTolerance(ANGLE_TOLERANCE);
 		contextSimilarityCalculator = sharedSpace.getContextCalculator();
 		objectSimilarityCalculator = sharedSpace.getObjectCalculator();
 		
@@ -132,6 +137,9 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		System.gc();
 		System.out.println("\n------\nStart ValidationPlugIn ...\n------");
 		System.out.println("Validation Threshold: " + VALID_THRESHOLD + "; Context Similarity Weight: " + CONTEXT_WEIGHT + "; Measure: " + contextSimilarityType);
+		System.out.println("Angle tolerance: " + sharedSpace.getAngleTolerance());
+		System.out.println("Input dataset contains " + matchList.getUnmatchedSourceFeatures().size() + " alone source objects");
+		System.out.println("Checking input matches: " + matchList.getSourceList().size());
 		
 		Queue<Feature> queue = new LinkedList<Feature>(); // a queue storing matches waiting to be validated
 		Random random = new  Random();
@@ -188,6 +196,8 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 				matchList.supplementSingleMatch(queue);
 			}
 		}
+		int validatedMatchNum = matchList.getSourceList().size();
+		System.out.println("Complete validating input matches: " + validatedMatchNum);
 		
 		///////////////////////////////////////////
 		// Detect Omitted Matches
@@ -225,9 +235,12 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 					calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, true);
 					matchList.setContextSimilarity(singleF, contextSimilarity);
 					matchList.setObjectSimilarity(singleF, objectSimilarity);
+				} else {
+					System.out.println("failed to match: " + singleF.getID() +  "-" + potentialMatchedObject.getID()+ ": context " + contextSimilarity + " + object " + objectSimilarity + " = confidence " + confidenceLevel);
 				}
 			}
 		}
+		System.out.println("Detected " + (matchList.getSourceList().size()-validatedMatchNum) + " missing matches");
 		// went through single objects in target layer
 //		for (Feature singleF : unmatchedTargetFeatures) {
 //			ArrayList<Feature> tempMatch = new ArrayList<Feature>();
@@ -444,6 +457,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		Pair<FeatureCollection, FeatureCollection> npair = matchList.getNewMatches();
 		context.addLayer(StandardCategoryNames.WORKING, "New Matches -- source layer", npair.getKey());
 		context.addLayer(StandardCategoryNames.WORKING, "New Matches -- target layer", npair.getValue());
+		System.out.println("result\nvalid matches: " + pair.getKey().size() +"; invalide matches: " + pair.getValue().size() + "; new matches: " + npair.getKey().size());
 	}
 
 }

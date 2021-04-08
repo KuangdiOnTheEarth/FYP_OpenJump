@@ -46,7 +46,7 @@
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.datasource.SaveFileDataSourceQueryChooser - FILE CHOOSER DIRECTORY</key>
-      <value class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹</value>
+      <value class="java.lang.String">/Users/gungnir/Desktop</value>
     </mapping>
     <mapping>
       <key class="java.lang.String">com.vividsolutions.jump.workbench.ui.WorkbenchFrame - HORIZONTAL_KEY</key>
@@ -103,16 +103,16 @@
     <mapping>
       <key class="java.lang.String">org.openjump.core.ui.plugin.file.OpenRecentPlugIn.FILES</key>
       <value class="java.util.LinkedHashSet">
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/ArcGis/Prince George/Building_Outlines.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/darling/planet_-82.314_26.26_0542a81a-shp/shape/buildings.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Pcince_1_ArcGIS.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Prince_1_bbb.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/未命名文件夹/Pcince_1_arc.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/bbbike/Prince George/shape/buildings.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_1_arc.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_1_bbb.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_2_arc.shp</item>
-        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_2_bbb.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/Prince_3_arc.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/LasCruces_1_bbb.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/LasCruces_1_arc.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/darling/f73ec27eaf13412bb81be82b9716b2b3_0/Building_Footprints.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/LeeCounty_1_arc.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/fyp data/LeeCounty_1_bbb.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/groundtruth/LeeCounty_1_groundtruth_bbb.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/darling/623881feda29426b868a37c3fc883427_0/52f5e865-7164-43c1-ac8e-2acfee3bf073202046-1-13a92bj.dphi.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/darling/Cambridge/Building_Footprints.shp</item>
+        <item class="java.lang.String">/Users/gungnir/Desktop/Pegasus/3050 FYP/data/bbbike/Cambridge/buildings.shp</item>
       </value>
     </mapping>
     <mapping>

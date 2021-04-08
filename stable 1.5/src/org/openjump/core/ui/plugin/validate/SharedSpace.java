@@ -22,6 +22,7 @@ public class SharedSpace {
 	private Layer sourceLayer = null;
 	private Layer targetLayer = null;
 	
+	
 	private MatchList matchList = null;
 	private SupportingRelations supportingRelations = null;
 	private Pair<ArrayList<Feature>, ArrayList<Feature>> invalidSurrMatches = null; // source invalid features, matched target layer objects
@@ -43,7 +44,7 @@ public class SharedSpace {
 	private String currentContextSimilarityType = CS_STAR;
 	private String currentObjectSimilarityType = OS_OVERLAY;
 	
-	public final int STAR_DEGREE_RANGE = 5;
+	public int ANGLE_TOLERANCE = 5;
 	
 	/**
 	 * The instance getter of Single Pattern
@@ -133,16 +134,24 @@ public class SharedSpace {
 		}
 	}
 	
+	public void setAngleTolerance(int t) {
+		this.ANGLE_TOLERANCE = t;
+	}
+	
+	public int getAngleTolerance() {
+		return this.ANGLE_TOLERANCE;
+	}
+	
 	public AbstractContextCalculator getContextCalculator() {
 		if (currentContextSimilarityType == CS_STAR) {
-			return new StarContextCalculator(this.STAR_DEGREE_RANGE);
+			return new StarContextCalculator(this.ANGLE_TOLERANCE);
 		} else if (currentContextSimilarityType == CS_SEQ) {
 			return new RouteContextCalculator();
 		} 
 		
 		
 		else {
-			return new StarContextCalculator(this.STAR_DEGREE_RANGE);
+			return new StarContextCalculator(this.ANGLE_TOLERANCE);
 		}
 	}
 	
