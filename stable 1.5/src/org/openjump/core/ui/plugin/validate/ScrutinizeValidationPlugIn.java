@@ -22,6 +22,7 @@ import com.vividsolutions.jump.workbench.plugin.EnableCheckFactory;
 import com.vividsolutions.jump.workbench.plugin.MultiEnableCheck;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 import com.vividsolutions.jump.workbench.plugin.ThreadedPlugIn;
+import com.vividsolutions.jump.workbench.ui.AboutDialog;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
@@ -34,7 +35,7 @@ import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
  */
 public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
-	private String T1 = "enter the id of a feature from the match to check the validation process & result";
+	private String T1 = "Please enter the ID of a source layer object to scrutinize its validation process";
     private String T2 = "select layer";
     private String T3 = "object ID";
 
@@ -92,20 +93,26 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 	    System.gc();
 	    matchList = sharedSpace.getMatchList();
 	    
+	    String result = new String();
+	    result += "<html>";
+	    
 	    System.out.println("\n\n");
 
 		// create a buffer surrounding the being checked feature
+	    
 		Feature sourceFeature = matchList.getSourceFeatureByID(featureID);
 		if (sourceFeature == null) {
-			System.out.println("No feature of ID = " + featureID + " can be found");
+			result += "No feature of ID = " + featureID + " can be found</html>";
+			showResult(context, result);
+			return;
 		}
 		
-		System.out.println("---------------- Scrutinizing the validation process for id = " + sourceFeature.getID() + " --------------");
-		System.out.println("Validation Result: " + (matchList.getConfidenceLevel(sourceFeature)>=matchList.getValidThreshold()?"Valid":"Invalid"));
-		System.out.println("Confidence Level: " + String.format("%.4f", matchList.getConfidenceLevel(sourceFeature)) + " ( threshold: " + matchList.getValidThreshold() + " )");
-		System.out.println("Context Similarity: " + String.format("%.4f", matchList.getContextSimilarity(sourceFeature)) + " ( weight: " + matchList.getContextWeight() + " )"); 
-		System.out.println("Object Similarity: " + String.format("%.4f", matchList.getObjectSimilarity(sourceFeature)) + " ( weight: " + (1-matchList.getContextWeight()) + " )"); 
-		System.out.println("Details: ");
+		result += "---------------- Scrutinizing the validation process for id = " + sourceFeature.getID() + " --------------<br>";
+		result += "Validation Result: " + (matchList.getConfidenceLevel(sourceFeature)>=matchList.getValidThreshold()?"Valid<br>":"Invalid<br>");
+		result += "Confidence Level: " + String.format("%.4f", matchList.getConfidenceLevel(sourceFeature)) + " ( threshold: " + matchList.getValidThreshold() + " )<br>";
+		result += "\tContext Similarity: " + String.format("%.4f", matchList.getContextSimilarity(sourceFeature)) + " ( weight: " + String.format("%.2f", matchList.getContextWeight()) + " )<br>"; 
+		result += "\tObject Similarity: " + String.format("%.4f", matchList.getObjectSimilarity(sourceFeature)) + " ( weight: " + String.format("%.2f", 1-matchList.getContextWeight()) + " )<br></html>"; 
+		result += "Details: ";
 		Geometry sfGeom = sourceFeature.getGeometry();
 		Geometry buffer = sfGeom.buffer(matchList.getBufferRadius(sourceFeature));
 		
@@ -161,7 +168,17 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 		
 		
 		System.out.println("done\n");
-	    
+		showResult(context, result);
+		
 	}
+    
+    private void showResult(PlugInContext context, String info) {
+
+    	MultiInputDialog dialog = new MultiInputDialog(
+	            context.getWorkbenchFrame(), getName(), true);
+		dialog.addLabel(info);
+        GUIUtil.centreOnWindow(dialog);
+        dialog.setVisible(true);
+    }
 
 }
