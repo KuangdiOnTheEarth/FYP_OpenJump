@@ -12,8 +12,9 @@ import com.vividsolutions.jump.feature.FeatureSchema;
 import javafx.util.Pair;
 
 /**
- * This class is used to store the matches to be validated
- * @author Kuangdi
+ * This class stores the matches to be validated.
+ * In validation process, the context similarity, object similarity and status of match will also be recorded in this class
+ * @author Guangdi Hu
  *
  */
 public class MatchList {
@@ -31,7 +32,6 @@ public class MatchList {
 	private ArrayList<Feature> targetFeatureList = null; 
 	private ArrayList<Double> contextSimilarties = null;
 	private ArrayList<Double> objectSimilarities = null;
-//	private HashMap<Integer, Integer> hMap = null;
 	private ArrayList<Double> bufferRadiusList = null;
 
 	private ArrayList<Integer> validationStatuses = null;
@@ -42,7 +42,7 @@ public class MatchList {
 	private final int NEW          = 4;
 	
 	/**
-	 * The following fields are used for detecting omitted matches
+	 * The following fields are used for detecting missing matches
 	 */
 	private ArrayList<Feature> unmatchedSourceFeatures = null; 
 	private ArrayList<Feature> unmatchedTargetFeatures = null; 
@@ -57,7 +57,6 @@ public class MatchList {
 		contextSimilarties = new ArrayList<Double>();
 		objectSimilarities = new ArrayList<Double>();
 		bufferRadiusList = new ArrayList<Double>();
-//		hMap = new HashMap<Integer, Integer>();
 		unmatchedSourceFeatures = new ArrayList<Feature>();
 		unmatchedTargetFeatures = new ArrayList<Feature>();
 	}
@@ -72,10 +71,14 @@ public class MatchList {
 			objectSimilarities.set(i, 0.0);
 			validationStatuses.set(i, UNDISCOVERED);
 		}
-		
-//		hMap.clear();
 	}
 	
+	
+	/**
+	 * Store a new match into the list.
+	 * @param sourceFeature The source layer object involved in the new match
+	 * @param targetFeature The target layer object involved in the new match
+	 */
 	public void storeMatch(Feature sourceFeature, Feature targetFeature) {
 		int sourceIndex = sourceFeatureList.indexOf(sourceFeature);
 		int targetIndex = targetFeatureList.indexOf(targetFeature);
@@ -93,7 +96,6 @@ public class MatchList {
 			}
 			if (!duplicated) {
 				storeNonDuplicatedMatch(sourceFeature, targetFeature);
-//				System.out.println("\t ----------- source f multi-match");
 			}
 		} else if (targetIndex >= 0) {
 			// multiple matches are assigned to this target feature, check: if this match has been stored, ignore it
@@ -106,7 +108,6 @@ public class MatchList {
 			}
 			if (!duplicated) {
 				storeNonDuplicatedMatch(sourceFeature, targetFeature);
-//				System.out.println("\t target f multi-match -----------");
 			}
 		} else {
 			System.out.println("//////////////////////////");
@@ -115,7 +116,11 @@ public class MatchList {
 		}
 	}
 	
-	// return true if the input object is contained by a match, and that match is not invalid
+	/**
+	 * Check whether a match can act as the supporting match for others
+	 * @param f the match to be checked
+	 * @return true if this match is not invalid; false otherwise
+	 */
 	public boolean isSuitableSupportingMatch(Feature f) {
 		int index = sourceFeatureList.indexOf(f);
 		if( index == -1) {
@@ -128,12 +133,15 @@ public class MatchList {
 		}
 	}
 	
+	/**
+	 * Find and return an unprocessed match. This method is called to detect the spatially separated objects 
+	 * @param queue The queue in forward traversal, the unprocessed match will be pushed onto this queue
+	 * @return false if all matches have been processed; true otherwise
+	 */
 	public boolean supplementSingleMatch(Queue<Feature> queue) {
 		for (int i = 0 ; i < validationStatuses.size(); i++) {
-//			if (validationStatuses.get(i) == UNDISCOVERED) {
 			if (shouldBeQueued(sourceFeatureList.get(i))) {
 				queue.offer(sourceFeatureList.get(i));
-//				setAsInQueue(sourceFeatureList.get(i));
 				validationStatuses.set(i, INQUEUE);
 				System.out.println("Supplement Match: " + sourceFeatureList.get(i).getID());
 				return true;
@@ -142,6 +150,9 @@ public class MatchList {
 		return false;
 	}
 	
+	/**
+	 * Auxiliary method for add a match into record, and initialize its statuses
+	 */
 	private void storeNonDuplicatedMatch(Feature sourceFeature, Feature targetFeature) {
 		sourceFeatureIDs.add(sourceFeature.getID());
 		targetFeatureIDs.add(targetFeature.getID());
@@ -151,21 +162,33 @@ public class MatchList {
 		contextSimilarties.add(1.0);
 		objectSimilarities.add(0.0); // object similarity will be considered only if context similarity lower than threshold, so it is initiated to 0
 		bufferRadiusList.add(0.0);
-//		hMap.put(sourceFeature.getID(), UNDISCOVERED);
 	}
 	
+	/**
+	 * Check whether a source layer object in alone, record in in relative list if it is alone
+	 * @param sourceFeature the being checked source layer object
+	 */
 	public void tryAddUnmatchedSourceFeature(Feature sourceFeature) {
 		if (!sourceFeatureList.contains(sourceFeature) && !unmatchedSourceFeatures.contains(sourceFeature)) {
 			unmatchedSourceFeatures.add(sourceFeature);
 		}
 	}
 	
+	/**
+	 * Check whether a target layer object in alone, record in in relative list if it is alone
+	 * @param sourceFeature the being checked target layer object
+	 */
 	public void tryAddUnmatchedTargetFeature(Feature targetFeature) {
 		if (!targetFeatureList.contains(targetFeature) && !unmatchedTargetFeatures.contains(targetFeature)) {
 			unmatchedTargetFeatures.add(targetFeature);
 		}
 	}
 	
+	/**
+	 * Find a source layer object by its id
+	 * @param id ID of the object
+	 * @return The source layer object specified by the input id
+	 */
 	public Feature getSourceFeatureByID(int id) {
 		int index = sourceFeatureIDs.indexOf(id);
 		if (index == -1) {
@@ -174,6 +197,11 @@ public class MatchList {
 		return sourceFeatureList.get(index);
 	}
 	
+	/**
+	 * Find a target layer object by its id
+	 * @param id ID of the object
+	 * @return The target layer object specified by the input id
+	 */
 	public Feature getTargetFeatureByID(int id) {
 		int index = targetFeatureIDs.indexOf(id);
 		if (index == -1) {
@@ -182,12 +210,24 @@ public class MatchList {
 		return targetFeatureList.get(index);
 	}
 	
+	/**
+	 * Find a source layer object by its index in record
+	 * @param i index of the object
+	 * @return The source layer object specified by its index
+	 */
 	public Feature getSourceFeatureByIndex(int i) {
 		return sourceFeatureList.get(i);
 	}
+	
+	/**
+	 * Find a target layer object by its index in record
+	 * @param i index of the object
+	 * @return The target layer object specified by its index
+	 */
 	public Feature getTargetFeatureByIndex(int i) {
 		return targetFeatureList.get(i);
 	}
+	
 	/**
 	 * Return the Feature object of corresponding geographic object in target layer (according to the stored matches)
 	 * @param sourceFeature an object in source layer 
@@ -201,6 +241,7 @@ public class MatchList {
 			return targetFeatureList.get(i);
 		}
 	}
+	
 	/**
 	 * Return the Feature object of corresponding geographic object in source layer (according to the stored matches)
 	 * @param targetFeature an object in target layer 
@@ -215,7 +256,9 @@ public class MatchList {
 		}
 	}
 	
-	
+	/**
+	 * Return the number of recorded matches
+	 */
 	public int numberOfFeatures() {
 		if (sourceFeatureList.size() == targetFeatureList.size() && sourceFeatureList.size() == validationStatuses.size()) {
 			return sourceFeatureList.size();
@@ -224,13 +267,16 @@ public class MatchList {
 		}
 	}
 	
+	/**
+	 * Check whether a match should be pushed onto the queue of forward traversal.
+	 * @param sourceFeature the source layer object involved in the being checked match.
+	 * @return true if it has not been discovered
+	 */
 	public boolean shouldBeQueued(Feature sourceFeature) {
 		int i = sourceFeatureList.indexOf(sourceFeature);
 		if (i == -1) {
-//			System.out.println("This feature in not found in match records");
 			return false;
 		}
-//		if (!hMap.containsKey(sourceFeature.getID()) && hMap.get(sourceFeature.getID()) == UNDISCOVERED) {
 		if (validationStatuses.get(i) == UNDISCOVERED) {
 			return true;
 		} else {
@@ -238,49 +284,70 @@ public class MatchList {
 		}
 	}
 	
+	/**
+	 * Change the status of a match as InQueue
+	 * @param sourceFeature the target match
+	 */
 	public void setAsInQueue(Feature sourceFeature) {
-//		hMap.put(sourceFeature.getID(), INQUEUE);
 		int i = sourceFeatureList.indexOf(sourceFeature);
 		if (i >= 0) {
 			validationStatuses.set(i, INQUEUE);
 		}
 	}
 	
+	/**
+	 * Change the status of a match as Invalid
+	 * @param sourceFeature the target match
+	 */
 	public void setAsInvalid(Feature sourceFeature) {
-//		hMap.put(sourceFeature.getID(), INVALID);
 		int i = sourceFeatureList.indexOf(sourceFeature);
 		if (i >= 0) {
 			validationStatuses.set(i, INVALID);
 		}
 	}
 	
+	/**
+	 * Change the status of a match as Valid
+	 * @param sourceFeature the target match
+	 */
 	public void setAsValid(Feature sourceFeature) {
-//		hMap.put(sourceFeature.getID(), VALID);
 		int i = sourceFeatureList.indexOf(sourceFeature);
 		if (i >= 0) {
 			validationStatuses.set(i, VALID);
 		}
 	}
 	
+	/**
+	 * Change the status of a match as New, this marks the match as a detected missing match
+	 * @param sourceFeature the target match
+	 */
 	public void setAsNew(Feature sourceFeature) {
-//		hMap.put(sourceFeature.getID(), VALID);
 		int i = sourceFeatureList.indexOf(sourceFeature);
 		if (i >= 0) {
 			validationStatuses.set(i, NEW);
 		}
 	}
 	
+	/**
+	 * Check whether a match is marked as Invalid; before searching in record, the existence of this match should be checked
+	 * @param sourceFeature the source layer object involved in the being checked match.
+	 * @return true if the match is invalid
+	 */
 	public boolean isInvalid(Feature sourceFeature) {
 		int i = sourceFeatureList.indexOf(sourceFeature);
 		if (i >= 0) {
 			return validationStatuses.get(i) == INVALID || validationStatuses.get(i) == NEW; // ignore newly detected omitted matches
 		} else {
-//			System.out.println("--isInvalid-- Not found id = " + sourceFeature.getID());
 			return true;
 		}
 	}
 	
 	
+	/**
+	 * Record the context similarity value of a match
+	 * @param srcFeature the source layer object involved in the being checked match
+	 * @param similarity context similarity
+	 */
 	public void setContextSimilarity(Feature srcFeature, Double similarity) {
 		int i = sourceFeatureList.indexOf(srcFeature);
 		if (i == -1) {
@@ -290,6 +357,11 @@ public class MatchList {
 		contextSimilarties.set(i, similarity);
 	}
 	
+	/**
+	 * Record the object similarity value of a match
+	 * @param srcFeature the source layer object involved in the being checked match
+	 * @param similarity object similarity
+	 */
 	public void setObjectSimilarity(Feature srcFeature, Double similarity) {
 		int i = sourceFeatureList.indexOf(srcFeature);
 		if (i == -1) {
@@ -299,6 +371,11 @@ public class MatchList {
 		objectSimilarities.set(i, similarity);
 	}
 	
+	/**
+	 * Return the context similarity of a match
+	 * @param f the source layer object involved in the being checked match
+	 * @return context similarity of this match
+	 */
 	public double getContextSimilarity(Feature f) {
 		int i = sourceFeatureList.indexOf(f);
 		if (i >= 0) {
@@ -308,6 +385,11 @@ public class MatchList {
 		return 0;
 	}
 	
+	/**
+	 * Return the object similarity of a match
+	 * @param f the source layer object involved in the being checked match
+	 * @return object similarity of this match
+	 */
 	public double getObjectSimilarity(Feature f) {
 		int i = sourceFeatureList.indexOf(f);
 		if (i >= 0) {
@@ -317,6 +399,11 @@ public class MatchList {
 		return 0;
 	}
 	
+	/**
+	 * Calculate and return the confidence level of a match
+	 * @param f the source layer object involved in the being checked match
+	 * @return the confidence level of this match
+	 */
 	public double getConfidenceLevel(Feature f) {
 		int i = sourceFeatureList.indexOf(f);
 		if (i >= 0) {
@@ -341,8 +428,9 @@ public class MatchList {
 	public void setValidThreshold(Double t) {
 		this.VALID_THRESHOLD = t;
 	}
+	
 	/**
-	 * 
+	 * Get the validation result on the input matches, i.e. the valid match set and invalid match set
 	 * @return a set of all VALID matches and a set of all INVALID matches
 	 */
 	public Pair<FeatureCollection, FeatureCollection> getValidationResult() {
@@ -365,8 +453,8 @@ public class MatchList {
 	}
 	
 	/**
-	 * 
-	 * @return the newly discovered matches for single objects
+	 * Get the result of detecting missing matches
+	 * @return two sets of source layer & target layer objects involved in missing matches
 	 */
 	public Pair<FeatureCollection, FeatureCollection> getNewMatches() {
 		FeatureCollection sourceColl = null;
@@ -383,6 +471,11 @@ public class MatchList {
 		return new Pair<FeatureCollection, FeatureCollection>(sourceColl, targetColl);
 	}
 	
+	/**
+	 * Record the buffer radius applied on a match, the buffer radius should larger than 0
+	 * @param feature the source layer object involved in the being checked match
+	 * @param r buffer radius
+	 */
 	public void setBufferRadius(Feature feature, double r) {
 		int i = sourceFeatureList.indexOf(feature);
 		if (i >= 0) {
@@ -390,6 +483,11 @@ public class MatchList {
 		}
 	}
 	
+	/**
+	 * Get the buffer radius of a match, this may be used to visualize the process of search for supporting matches
+	 * @param feature the source layer object involved in the being checked match
+	 * @return the buffer radius of the match; -1 if the match not exists
+	 */
 	public double getBufferRadius(Feature feature) {
 		int i = sourceFeatureList.indexOf(feature);
 		if (i == -1) {
@@ -398,10 +496,18 @@ public class MatchList {
 		return bufferRadiusList.get(i);
 	}
 
+	/**
+	 * Get the list of alone objects in source layer
+	 * @return the list of alone objects in source layer
+	 */
 	public ArrayList<Feature> getUnmatchedSourceFeatures() {
 		return this.unmatchedSourceFeatures;
 	}
 	
+	/**
+	 * Get the list of alone objects in target layer
+	 * @return the list of alone objects in target layer
+	 */
 	public ArrayList<Feature> getUnmatchedTargetFeatures() {
 		return this.unmatchedTargetFeatures;
 	}

@@ -3,9 +3,9 @@ package org.openjump.core.ui.plugin.validate.pojo;
 import com.vividsolutions.jump.feature.Feature;
 
 /**
- * Used in the process of ordering the surrounding objects clockwise
- * provides methods to compare the order of two centroid points referring to the center point
- * @author Kuangdi
+ * Used in the process of ordering the supporting objects in anti-clockwise order,
+ * provides methods to compare the order of two supporting objects referring to the candidate object
+ * @author Guangdi Hu
  *
  */
 public class RelativePosition {
@@ -43,30 +43,12 @@ public class RelativePosition {
 				return false;
 			} else { // this.sin >= 0 && p.sin() >= 0
 				return this.cos < p.cos();
-//				if (this.cos >= 0 && p.cos() >= 0) {
-//					return this.sin > p.sin();
-//				} else if (this.cos < 0 && p.cos < 0) {
-//					return this.sin < p.sin();
-//				} else if (this.cos >= 0 && p.cos() < 0) {
-//					return false;
-//				} else if (this.cos < 0 && p.cos() >= 0) {
-//					return true;
-//				}
 			}
 		} else if (this.sin < 0){
 			if (p.sin() >= 0) {
 				return true;
 			} else {
 				return this.cos > p.cos();
-//				if (this.cos >= 0 && p.cos() >= 0) {
-//					return this.sin > p.sin();
-//				} else if (this.cos < 0 && p.cos < 0) {
-//					return this.sin < p.sin();
-//				} else if (this.cos >= 0 && p.cos() < 0) {
-//					return true;
-//				} else if (this.cos < 0 && p.cos() >= 0) {
-//					return false;
-//				}
 			}
 		}
 		System.out.println("--RelativePosition-- None of the case is met in method'isAntiClockwiseThan' with this.sin=" + this.sin);

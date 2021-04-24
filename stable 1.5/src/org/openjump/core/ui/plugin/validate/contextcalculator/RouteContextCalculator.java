@@ -40,7 +40,7 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 		}
 		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
 		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), targetFeature);
-		return sourceSeq.calContextSimilarityWith(targetSeq);
+		return sourceSeq.calContextSimilarityWith(targetSeq, false);
 	}
 	
 	
