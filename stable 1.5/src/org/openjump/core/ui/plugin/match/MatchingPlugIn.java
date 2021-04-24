@@ -149,7 +149,7 @@ public class MatchingPlugIn extends ThreadedBasePlugIn {
     private String target_layer_name;
     private boolean single_target = false;
     // Parameters : geometry parameters
-    private GeometryMatcher geometry_matcher = CentroidDistanceMatcher.instance();
+    private GeometryMatcher geometry_matcher = OverlapsMatcher.instance();
     private double max_distance = geometry_matcher.getMaximumDistance();
     private boolean set_max_distance = !Double.isNaN(max_distance);
     private double min_overlapping = geometry_matcher.getMinimumOverlapping();

@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class OverlapsMatcher extends GeometryMatcher {
     
     private static final OverlapsMatcher OVERLAPS =
-        new OverlapsMatcher(50.0);
+        new OverlapsMatcher(70.0);
     
     public static final OverlapsMatcher instance() {
         return OVERLAPS;
