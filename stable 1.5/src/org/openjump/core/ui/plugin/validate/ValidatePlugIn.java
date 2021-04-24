@@ -34,34 +34,52 @@ import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 
 import javafx.util.Pair;
 
+/**
+ * The plug-in for validating input matches. This plug-in works on the matches generated {@link MatchMap}, 
+ * classify the input matches into valid and invalid match sets, then detect the missing match from the two matched object sets.
+ * Finally, the valid match set, invalid match set and missing match set will be visualized in different layers.
+ * @author Guangdi Hu
+ *
+ */
 public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	
+	// Labels in UI
 	private final String T_Context_Measure = "context similarity measure";
 	private final String T_Threshold = "validation threshold";
 	private final String T_Context_Weight = "weight of context similarity";
 	private final String T_Context_NUM = "mininal neighbouring objects";
 	private final String T_Angle_Tolerance = "angle tolerance";
 	
-	private double VALID_THRESHOLD = 0.8; // if confidence level exceeds or equal to threshold, the match is considered as valid
+	// Parameters (set by user in dialog window)
+	private double VALID_THRESHOLD = 0.8;
 	private double CONTEXT_WEIGHT = 0.8;
 	private String CONTEXT_MEASURE = "";
 	private int ANGLE_TOLERANCE = 5;
 	
-	private int MIN_SURR_OBJ_NEEDED = 5; // the minimal number of surrounding objects needed
-	private final double BUFFER_INC_RATE = 1.1; // if too less surrounding object is found, the radius of buffer will increase at this rate
+	/**
+	 * The minimal number of supporting objects needed in context similarity calculation
+	 */
+	private int MIN_SURR_OBJ_NEEDED = 5;
+	
+	
+	/**
+	 * Control the growth rate of the buffer. 
+	 * If the current buffer radius fails to capture enough supporting matches, 
+	 * the buffer will be extended in this rate to search for supporting matches again.
+	 */
+	private final double BUFFER_INC_RATE = 1.1;
 	
 	private SharedSpace sharedSpace;
 	private MatchList matchList;
 	private SupportingRelations supportingRelations;
 	
-//	private final double bufferRadius = 0.5;
-	private boolean VISUALIZE_VALIDATION_PROCESS = false;
 	private AbstractContextCalculator contextSimilarityCalculator;
 	private AbstractObjectCalculator objectSimilarityCalculator;
 	
-	private String pluginName = "ValidateAbstractPlugIn";
 	private String contextSimilarityType = "star"; // star || sequence
 	private String objectSimilarityType = "overlay";
+	
+	
 	
 	public void initialize(PlugInContext context) throws Exception {
 	    FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
@@ -116,9 +134,15 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
     
     
 	
-
+    /**
+     * The main body of the validation algorithm
+     */
 	@Override
 	public void run(TaskMonitor monitor, PlugInContext context) throws Exception {
+		
+		/*
+		 * Call factory to generate required context & object similarity calculator.
+		 */
 		if (CONTEXT_MEASURE == "angle difference") {
 			this.contextSimilarityType = "star";
 		} else if (CONTEXT_MEASURE == "sequence order") {
@@ -129,6 +153,9 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		contextSimilarityCalculator = sharedSpace.getContextCalculator();
 		objectSimilarityCalculator = sharedSpace.getObjectCalculator();
 		
+		/*
+		 * Fetch the match set, initialize the status of input matches.
+		 */
 		this.matchList = sharedSpace.getMatchList();
 		matchList.clear();
 		matchList.setValidThreshold(VALID_THRESHOLD);
@@ -141,7 +168,10 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		System.out.println("Input dataset contains " + matchList.getUnmatchedSourceFeatures().size() + " alone source objects");
 		System.out.println("Checking input matches: " + matchList.getSourceList().size());
 		
-		Queue<Feature> queue = new LinkedList<Feature>(); // a queue storing matches waiting to be validated
+		/*
+		 * Initialize a queue to contain the discovered matches in the forward traversal.
+		 */
+		Queue<Feature> queue = new LinkedList<Feature>();
 		Random random = new  Random();
 		int numFeatures = matchList.numberOfFeatures();
 		if (numFeatures < 0) {
@@ -152,39 +182,52 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		queue.offer(startingFeature);
 		matchList.setAsInQueue(startingFeature);
 		
+		/*
+		 * Fetch the source & reference geographic object sets.
+		 */
 		final List<Feature> sourceFeatures = sharedSpace.getSourceLayer().getFeatureCollectionWrapper().getFeatures();
 		final List<Feature> targetFeatures = sharedSpace.getTargetLayer().getFeatureCollectionWrapper().getFeatures();
+		
+		/*
+		 * Initialize the record of supporting relations.
+		 */
 		supportingRelations = new SupportingRelations();
 		sharedSpace.storeSupportingRelations(supportingRelations);
 		contextSimilarityCalculator.refreshSupportingRelation();
-		int matchCount = 0;
+		
+		
 				
 		///////////////////////////////////////////
-		// Validate Existing Matches
+		// Validate Input Matches
 		///////////////////////////////////////////
-		
 		while (!queue.isEmpty()) {
-			// get the object from the match being checked
+			// Get the match to be validated
 			Feature sourceFeature = queue.poll();
-			matchCount++;
 			
-			// find the surrounding matches
+			// Find the surrounding matches
 			ArrayList<Feature> sourceSurr = findSurroundingMatch(sourceFeature, sourceFeatures, queue, true, false);
 			
-			// calculate context similarity
+			/*
+			 * Calculate context similarity & object similarity.
+			 */
 			double contextSimilarity = calContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr, false);
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
 			double objectSimilarity = objectSimilarityCalculator.calObjectSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature));
 			matchList.setObjectSimilarity(sourceFeature, objectSimilarity);
-			// backtrack if the match is considered as invalid
+			
+			/*
+			 * Backtrack if the match is considered as invalid.
+			 */
 			if (matchList.getConfidenceLevel(sourceFeature) >= VALID_THRESHOLD) {
 				matchList.setAsValid(sourceFeature);
 			} else {
 				matchList.setAsInvalid(sourceFeature);
-//				backtrack(sourceFeature);
 				backtrackRecursion(sourceFeature, "");
 			}
 			
+			/*
+			 * Check and pick up the undiscovered matches caused by gap between object clusters
+			 */
 			if (queue.isEmpty()) {
 				int c = 0;
 				for (Feature f : sourceFeatures) {
@@ -199,30 +242,40 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		int validatedMatchNum = matchList.getSourceList().size();
 		System.out.println("Complete validating input matches: " + validatedMatchNum);
 		
+		
+		
 		///////////////////////////////////////////
-		// Detect Omitted Matches
+		// Detect Missing Matches
 		///////////////////////////////////////////
-		ArrayList<Feature> unmatchedSourceFeatures = matchList.getUnmatchedSourceFeatures();
-		ArrayList<Feature> unmatchedTargetFeatures = matchList.getUnmatchedTargetFeatures();
 
-		// went through single objects in source layer
+		/*
+		 * Find potential matches for all the alone objects in the source layer
+		 */
+		ArrayList<Feature> unmatchedSourceFeatures = matchList.getUnmatchedSourceFeatures();
 		for (Feature singleF : unmatchedSourceFeatures) {
 			ArrayList<Feature> tempMatch = new ArrayList<Feature>();
 			Geometry buffer = singleF.getGeometry();
-			// find potential match object from target matched list
+			
+			/*
+			 *  Find potential match object from target matched list
+			 */
 			for (Feature f : targetFeatures) {
 				if (buffer.intersects(f.getGeometry()) && !tempMatch.contains(f))
 					tempMatch.add(f);
 			}
-			// find potential match object from single target layer objects
+			/*
+			 *  Find potential match object from single target layer objects
+			 */
 			for (Feature f : matchList.getUnmatchedTargetFeatures()) {
 				if (buffer.intersects(f.getGeometry()) && !tempMatch.contains(f))
 					tempMatch.add(f);
 			}
-			// check the similarity with each potential match object
+			
+			/*
+			 *  Calculate the confidence level for each potential match
+			 */
 			for (Feature potentialMatchedObject : tempMatch) {
 				ArrayList<Feature> sourceSurr = findSurroundingMatch(singleF, sourceFeatures, null, false, false);
-				// calculate context similarity
 				double contextSimilarity = calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, false);
 				double objectSimilarity = objectSimilarityCalculator.calObjectSimilarity(singleF, potentialMatchedObject);
 				double confidenceLevel = contextSimilarity*matchList.getContextWeight() + objectSimilarity*(1-matchList.getContextWeight());
@@ -235,69 +288,45 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 					calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, true);
 					matchList.setContextSimilarity(singleF, contextSimilarity);
 					matchList.setObjectSimilarity(singleF, objectSimilarity);
-				} else {
-//					System.out.println("failed to match: " + singleF.getID() +  "-" + potentialMatchedObject.getID()+ ": context " + contextSimilarity + " + object " + objectSimilarity + " = confidence " + confidenceLevel);
 				}
 			}
 		}
 		System.out.println("Detected " + (matchList.getSourceList().size()-validatedMatchNum) + " missing matches");
-		// went through single objects in target layer
-//		for (Feature singleF : unmatchedTargetFeatures) {
-//			ArrayList<Feature> tempMatch = new ArrayList<Feature>();
-//			Geometry buffer = singleF.getGeometry();
-//			// find potential match object from source matched list
-//			for (Feature f : sourceFeatures) {
-//				if (buffer.intersects(f.getGeometry()) && !tempMatch.contains(f))
-//					tempMatch.add(f);
-//			}
-//			// find potential match object from single source layer objects
-//			for (Feature f : matchList.getUnmatchedSourceFeatures()) {
-//				if (buffer.intersects(f.getGeometry()) && !tempMatch.contains(f))
-//					tempMatch.add(f);
-//			}
-//			// check the similarity with each potential match object
-//			for (Feature f : tempMatch) {
-//				ArrayList<Feature> targetSurr = findSurroundingMatch(singleF, targetFeatures, null, false);
-//				// calculate context similarity
-//				double contextSimilarity = calContextSimilarity(singleF, matchList.getMatchedTargetFeature(singleF), targetSurr, false);
-//				double confidenceLevel = contextSimilarity;
-//				if (confidenceLevel < VALID_THRESHOLD) {
-//					// confidenceLevel + object similarity
-//				}
-//				if (confidenceLevel >= VALID_THRESHOLD) {
-//					calContextSimilarity(singleF, matchList.getMatchedTargetFeature(singleF), sourceSurr, true);
-//					matchList.setContextSimilarity(singleF, contextSimilarity);
-//					matchList.setAsNew(singleF);
-//				}
-//			}
-//		}
 		
 		showResult(context);
 		System.out.println("Validation Finished \n");
 	}
 	
+
 	/**
-	 * 
-	 * @param sourceFeature
-	 * @param sourceFeatures
-	 * @param queue
-	 * @param recordProcess false: the buffer radius & supporting relation will not be recorded (used in testing potential matches for single objects)
+	 * Find the supporting matches / Define the context for a candidate match.
+	 * @param sourceFeature The source layer object involved in the being checked candidate match
+	 * @param sourceFeatures Source geographic object set
+	 * @param queue Used to recored the discovered matches to support the forward traversal
+	 * @param recordProcess Set as true if the supporting matches should be recorded in supporting relations; this field is false when testing the potential matches 
+	 * @param isMissingMatch Set as true if the current being checked match is a missing match, this will leads to difference when recording the dependencies
 	 * @return
 	 */
-	private ArrayList<Feature> findSurroundingMatch(Feature sourceFeature, List<Feature> sourceFeatures, Queue<Feature> queue, boolean recordProcess, boolean omittedMatch) {
-		// create a buffer of center object
+	private ArrayList<Feature> findSurroundingMatch(Feature sourceFeature, List<Feature> sourceFeatures, Queue<Feature> queue, boolean recordProcess, boolean isMissingMatch) {
+		/*
+		 *  Create a buffer for the source layer object involved in the current match 
+		 */
 		Geometry sfGeom = sourceFeature.getGeometry();
-		Point sfCentroid =  sfGeom.getCentroid();
 		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
 		
 		double radius = sfGeom.getLength() / 4 / 4;
-//					double radius = Math.pow(sfGeom.getArea(), 1/2) / 4; // when area < 1, square root of it will become bigger
+		
+		// An alternative way to initialize buffer radius. But not applicable when area < 1, since square root of area will become bigger
+//		double radius = Math.pow(sfGeom.getArea(), 1/2) / 4;
+		
 		Geometry buffer = sfGeom.buffer(radius);
 		while (sourceSurr.size() < MIN_SURR_OBJ_NEEDED) {
 			sourceSurr.clear();
 			buffer = sfGeom.buffer(radius);
-//						Geometry buffer = sfCentroid.buffer(radius);
-	        // create lists to contain the surrounding objects
+			
+	        /*
+	         *  Create lists to contain the surrounding objects.
+	         */
 			for (Feature f : sourceFeatures) {
 				if (buffer.intersects(f.getGeometry()) && f != sourceFeature && matchList.isSuitableSupportingMatch(f)) {
 					sourceSurr.add(f);
@@ -308,7 +337,10 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		if (recordProcess) {
 			matchList.setBufferRadius(sourceFeature, radius);
 		}
-		// add surrounding features (matches) into queue
+		
+		/*
+		 *  Add surrounding features (matches) into queue
+		 */
 		if (queue != null) {
 			for (Feature f : sourceSurr) {
 				if (matchList.shouldBeQueued(f)) {
@@ -318,145 +350,73 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			}
 		}
 		
-		// display the surrounding objects in a new layer
-//					showSurrObjectsInLayer(context, sourceFeature, buffer, sourceSurr);
-		
-		// record the dependency
+		/*
+		 *  Record the dependencies between candidate match and its supporting matches
+		 */
 		if (recordProcess) {
-			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr, omittedMatch);
+			supportingRelations.addSupportingRelation(sourceFeature, sourceSurr, isMissingMatch);
 		}
+		
 		return sourceSurr;
 	}
 	
-	private void backtrack(Feature invalidFeature) {
-		System.out.println("--BackTrack: " + invalidFeature.getID() + "--");
-//		if (true) {
-//			return;
-//		}
-		Queue<Feature> currentLayerQueue = new LinkedList<Feature>();
-		currentLayerQueue.offer(invalidFeature);
-		int layerCount = 0;
-		
-		ArrayList<Feature> previousLayerFeatures = new ArrayList<Feature>();// the features have been recalculated in this backtrack, no need to be changed again
-		
-		while (!currentLayerQueue.isEmpty()) {
-			System.out.println("layer " + layerCount);
-			layerCount++;
-			Queue<Feature> nextLayerQueue = new LinkedList<Feature>();
-			
-			// the following loop go through the recalculation of one layer
-			while (!currentLayerQueue.isEmpty()) {
-				Feature cFeature = currentLayerQueue.poll();
-				previousLayerFeatures.add(cFeature);
-				System.out.println("\tChecking the matches " + cFeature.getID() + " supports");
-				// get the matches the invalid match supports / influenced by the invalid match
-				ArrayList<Feature> supports = supportingRelations.getFeaturesSupportedBy(cFeature);
-				if (supports == null) {
-					System.out.println("No supporting match found for id = " + cFeature.getID());
-				} else {
-					// recalculate the context similarity for the features which use the current invalid feature as supporting match
-					for (Feature f : supports) {
-						if (matchList.isInvalid(f)) { // not recalculate the already invalid matches
-							continue;
-						}
-						if (previousLayerFeatures.contains(f) || currentLayerQueue.contains(f) || nextLayerQueue.contains(f)) {
-							// in previous layers              | not influence same layer       | has already marked as invalid in next layer
-							continue;
-						}
-						double preCS = matchList.getContextSimilarity(f); // context similarity
-						double preOS = matchList.getObjectSimilarity(f); // object similarity
-						double preCL = matchList.getContextSimilarity(f); // confidence level
-						// find the surrounding objects again, this time ignore the new invalid feature
-						ArrayList<Feature> sourceSurr = findSurroundingMatch(f, matchList.getSourceList(), null, true, false);
-						double contextSimilarity = calContextSimilarity(f, matchList.getMatchedTargetFeature(f), sourceSurr, true);
-						matchList.setContextSimilarity(f, contextSimilarity);
-						if (matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
-							System.out.println(String.format("\t\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;%.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
-							matchList.setAsInvalid(f);
-							nextLayerQueue.add(f);
-						} else {
-							System.out.println(String.format("\t\t%d: %.4f --> %.4f", f.getID(), preCS, matchList.getContextSimilarity(f)));
-						}
-					}
-				}
-			}
-			currentLayerQueue = nextLayerQueue;
-		}
-	}
 	
-	
+	/**
+	 * Backtrack the and remedy the influence of an invalid match in a recursive way, 
+	 * recalculate the context similarity for all matches this invalid match supports.
+	 * @param invalidFeature The invalid match.
+	 * @param pre A prefix of the printed information, used to control the style
+	 */
 	private void backtrackRecursion(Feature invalidFeature, String pre) {
 		System.out.println(pre + "start backtrack " + invalidFeature.getID());
+		
+		/*
+		 * Used to control the style of the information printed out
+		 */
 		pre += "\t";
-		ArrayList<Feature> supports = supportingRelations.getFeaturesSupportedBy(invalidFeature);
 		int round = 1;
+		
+		ArrayList<Feature> supports = supportingRelations.getFeaturesSupportedBy(invalidFeature);
 		for (Feature f : supports) {
-			double preCS = matchList.getContextSimilarity(f); // context similarity
-			double preOS = matchList.getObjectSimilarity(f); // object similarity
-			double preCL = matchList.getContextSimilarity(f); // confidence level
+
+			double preCL = matchList.getContextSimilarity(f); // confidence level before re-calculation
 			
 			ArrayList<Feature> sourceSurr = findSurroundingMatch(f, matchList.getSourceList(), null, true, false);
 			double contextSimilarity = calContextSimilarity(f, matchList.getMatchedTargetFeature(f), sourceSurr, true);
 			matchList.setContextSimilarity(f, contextSimilarity);
 			
 			if (preCL >= VALID_THRESHOLD && matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
-//				System.out.println(String.format("\t\t%d: (cs;os;cl) %.4f;%.4f;%.4f --> %.4f;%.4f;%.4f", f.getID(), preCS, preOS, preCL, matchList.getContextSimilarity(f), matchList.getObjectSimilarity(f), matchList.getConfidenceLevel(f)));
 				System.out.println(pre + round + " Discover new invalid " + f.getID() + "  (" + preCL + "-->"+ matchList.getConfidenceLevel(f));
 				matchList.setAsInvalid(f);
+				// Use recursion to deal with chain effect occurs
 				backtrackRecursion(f, pre);
 			} else if (preCL < VALID_THRESHOLD && matchList.getConfidenceLevel(f) >= VALID_THRESHOLD) {
 				System.out.println(pre + round + " Recover as valid " + f.getID() + "  (" + preCL + "-->"+ matchList.getConfidenceLevel(f));
 				matchList.setAsValid(f);
-//				backtrackRecursion(f, pre);
 			}
 			round++;
 		}
 	}
 	
 	
+	/**
+	 * An auxiliary method for calculating context similarity. 
+	 */
 	private double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> sourceSurr, boolean isBackTrack) {
 		return contextSimilarityCalculator.calContextSimilarity(sourceFeature, targetFeature, sourceSurr, isBackTrack);
 	}
 	
-	
-	private double calObjectSimilarity(Feature f) {
-		return 0.0;
-	}
-	
-	
-	private void showSurrObjectsInLayer(PlugInContext context, Feature centerFeature, Geometry buffer, ArrayList<Feature> surrList) {
-		FeatureCollection surrColl = null;
-		FeatureSchema fs = centerFeature.getSchema();
-		surrColl = new FeatureDataset(fs);
-		
-		Feature centroid = centerFeature.clone(false);
-		centroid.setGeometry(centerFeature.getGeometry().getCentroid());
-		surrColl.add(centroid);
-		
-        Feature bufferFeature = centerFeature.clone(false);
-        bufferFeature.setGeometry(buffer);
-        surrColl.add(bufferFeature);
-		
-		for (Feature f : surrList) {
-			surrColl.add(f.clone(false)); 
-			
-			Feature centerPoint = f.clone(false);
-			centerPoint.setGeometry(f.getGeometry().getCentroid());
-			surrColl.add(centerPoint);
-		}
-		
-		context.addLayer(StandardCategoryNames.WORKING, "Surr " + centerFeature.getID(), surrColl);
-		
-	}
-	
-	
+	/**
+	 * Display the result of validation, visualize the three output sets in new layers  
+	 * @param context
+	 */
 	private void showResult(PlugInContext context) {		
 		Pair<FeatureCollection, FeatureCollection> pair = matchList.getValidationResult();
 		context.addLayer(StandardCategoryNames.WORKING, "Valid Matches", pair.getKey());
 		context.addLayer(StandardCategoryNames.WORKING, "Invalid Matches", pair.getValue());
 		Pair<FeatureCollection, FeatureCollection> npair = matchList.getNewMatches();
 		context.addLayer(StandardCategoryNames.WORKING, "New Matches -- source layer", npair.getKey());
-		context.addLayer(StandardCategoryNames.WORKING, "New Matches -- target layer", npair.getValue());
+//		context.addLayer(StandardCategoryNames.WORKING, "New Matches -- target layer", npair.getValue());
 		System.out.println("result\nvalid matches: " + pair.getKey().size() +"; invalide matches: " + pair.getValue().size() + "; new matches: " + npair.getKey().size());
 	}
 
