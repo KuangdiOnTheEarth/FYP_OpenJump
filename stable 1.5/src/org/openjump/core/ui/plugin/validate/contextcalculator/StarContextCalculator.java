@@ -8,19 +8,27 @@ import org.openjump.core.ui.plugin.validate.pojo.RelativePosition;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jump.feature.Feature;
 
+
+/**
+ * This context similarity calculator evaluates the context similarity using angle-difference measure.
+ * @author Guangdi Hu
+ *
+ */
 public class StarContextCalculator extends AbstractContextCalculator{
 	
-	private int numSections;
 	private int degreeRange;
 	private String name = "Star Calculus Context Similarity";
 	
 	public StarContextCalculator(int degreeSectionRange) {
-		this.numSections = 360 / degreeSectionRange;
 		this.degreeRange = degreeSectionRange;
 		System.out.println("Angle-Diffrence Context: angle tolerance is " + this.degreeRange);
 	}
 	
-	public double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr, boolean visualize) {
+	
+	/**
+	 * Calculate the context similarity using angle difference measure.
+	 */
+	public double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr) {
 		if (srcSurr == null) {
 			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
 		}
@@ -29,18 +37,11 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		}
 		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
 		for (Feature f : srcSurr) {
-//			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
 			if (f != sourceFeature) { // ignore the invalid matches & single objects
 				sourceSurr.add(f);
 			}
 		}
 		
-//		for (int i = 0; i < sourceSurr.size(); i++) { // sometimes the center feature may also appears in surrounding feature list, then remove it
-//			if (sourceSurr.get(i) == sourceFeature) {
-//				sourceSurr.remove(i);
-//				break;
-//			}
-//		}
 		ArrayList<Feature> targetSurr = findCorrespondingFeatures(sourceSurr); // may exists null features
 		
 		int numSurroundingObjects = sourceSurr.size();
@@ -60,28 +61,24 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		
 		int sameSectionCount = 0;
 		for (int i = 0; i < sourceDegrees.size(); i++) {
-//			if (getSectionIndex(sourceDegrees.get(i)) == getSectionIndex(targetDegrees.get(i))) {
-//				sameSectionCount++;
-//			}
 			double degreeDiff = Math.abs(sourceDegrees.get(i) - targetDegrees.get(i));
 			if (degreeDiff > 180) {
 				degreeDiff = 360 - degreeDiff;
 			}
 			if (degreeDiff <= degreeRange) {
 				sameSectionCount++;
-			} else {
-//				System.out.println("------- Out of range! " + degreeDiff + " exceeds " + degreeRange);
 			}
 		}
 		
 		double res = (double)sameSectionCount / (double)numSurroundingObjects;
-		if (!(res > 1) && !(res <= 1)) {
-//			System.out.println(sameSectionCount + " / " + numSurroundingObjects + " = " + res);
-		}
 		return res;
 	}
 	
 	
+	
+	/**
+	 * Record and report the detailed process in context similarity computation.
+	 */
 	public double checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr) {
 		if (srcSurr == null) {
 			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
@@ -91,23 +88,15 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		}
 		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
 		for (Feature f : srcSurr) {
-//			if (f != sourceFeature && !matchList.isInvalid(f)) { // ignore the invalid matches & single objects
 			if (f != sourceFeature) { // ignore the invalid matches & single objects
 				sourceSurr.add(f);
 			}
 		}
 		
-//		for (int i = 0; i < sourceSurr.size(); i++) { // sometimes the center feature may also appears in surrounding feature list, then remove it
-//			if (sourceSurr.get(i) == sourceFeature) {
-//				sourceSurr.remove(i);
-//				break;
-//			}
-//		}
 		ArrayList<Feature> targetSurr = findCorrespondingFeatures(sourceSurr); // may exists null features
 		
 		int numSurroundingObjects = sourceSurr.size();
 		
-		// get the list of all matched surrounding objects, remove all the null features in source and target surr lists
 		ArrayList<Feature> sourceMatchedFeatures = new ArrayList<Feature>();
 		ArrayList<Feature> targetMatchedFeatures = new ArrayList<Feature>();
 		
@@ -132,9 +121,6 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		
 		int sameSectionCount = 0;
 		for (int i = 0; i < sourceDegrees.size(); i++) {
-//			if (getSectionIndex(sourceDegrees.get(i)) == getSectionIndex(targetDegrees.get(i))) {
-//				sameSectionCount++;
-//			}
 			double degreeDiff = Math.abs(sourceDegrees.get(i) - targetDegrees.get(i));
 			if (degreeDiff > 180) {
 				degreeDiff = 360 - degreeDiff;
@@ -152,7 +138,9 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		
 		System.out.println(name + ": " + String.format("%.4f (%d/%d)", res, sameSectionCount, numSurroundingObjects));
 		
-		// print degree list
+		/*
+		 *  Print the list of degrees
+		 */
 		System.out.println(sourceFeature.getID() + ": ");
 		System.out.print("source: ");
 		for (int i = 0; i < sourceDegrees.size(); i++) {
@@ -168,7 +156,9 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		}
 		System.out.println("\n(" + sameSectionCount + " / " + numSurroundingObjects + ") = " + res);
 
-		// print invalid supporting matches
+		/*
+		 *  Print invalid supporting matches
+		 */
 		if (invalidSourceFeatures.size() > 0) {
 			System.out.println("A match with degree difference smaller than " + sharedSpace.ANGLE_TOLERANCE + " is considered as valid supporting match");
 			System.out.println("The following surrounding matches indicates a low context similarity:");
@@ -177,7 +167,9 @@ public class StarContextCalculator extends AbstractContextCalculator{
 				System.out.println("\t" + invalidSourceFeatures.get(i).getID() + "--" + invalidTargetFeatures.get(i).getID() + ": degree difference: " + String.format("%.4f", degreeDiff));
 			}
 		}
-		// print the unmatched surrounding features
+		/*
+		 *  Print the unmatched surrounding features
+		 */
 		if (sourceUnMatchedFeatures.size() > 0 || targetUnMatchedFeatures.size() > 0) {
 			System.out.println("The following surrounding object has no matching relations: ");
 			for (int i = 0; i < sourceUnMatchedFeatures.size(); i++) {
@@ -193,8 +185,15 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		
 		return res;
 	}
+	
 
 	
+	/**
+	 * Get the list of degrees between positive x-axis and connecting lines of candidate object and supporting objects.
+	 * @param features A list of supporting matches.
+	 * @param centerFeature The object involved in the candidate match.
+	 * @return
+	 */
 	private ArrayList<Double> getDegreeList(ArrayList<Feature> features, Feature centerFeature) {
 		ArrayList<Double> degrees = new ArrayList<Double>();
 		
@@ -212,8 +211,9 @@ public class StarContextCalculator extends AbstractContextCalculator{
 			if (xDiff == 0 && yDiff == 0) {
 				degrees.add(-1.0); // use negative degree value to represent the centroids overlay 
 			} else {
-				Double sin = yDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
-				Double cos = xDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
+//				Double sin = yDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
+//				Double cos = xDiff / Math.pow( Math.pow(xDiff,2)+Math.pow(yDiff,2), 0.5);
+				
 				double degree = Math.toDegrees(Math.atan2(yDiff, xDiff)); // degree: [-180, 180] 
 				if (degree < 0) {
 					degree = degree + 360; // degree: [0, 360)
@@ -225,14 +225,10 @@ public class StarContextCalculator extends AbstractContextCalculator{
 	}
 	
 	
-	private int getSectionIndex(double degree) {
-		return (int) (degree / degreeRange);
-	}
-	
 	/**
-	 * find the corresponding features (objects in target layer) of the surrounding objects of the being checked object in source layer
-	 * @param sourceFeatures
-	 * @return
+	 * Find the corresponding features (objects in target layer) of the surrounding objects of the being checked object in source layer
+	 * @param sourceFeatures The list of supporting features
+	 * @return A list of objects matched with the input features
 	 */
 	protected ArrayList<Feature> findCorrespondingFeatures(ArrayList<Feature> sourceFeatures) {
 		ArrayList<Feature> targetFeatures = new ArrayList<Feature>();

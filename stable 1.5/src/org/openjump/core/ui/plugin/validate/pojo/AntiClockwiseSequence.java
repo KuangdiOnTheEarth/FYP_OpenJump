@@ -54,7 +54,7 @@ public class AntiClockwiseSequence {
 	}
 	
 	
-	public Double calContextSimilarityWith(AntiClockwiseSequence target, boolean visualize) {
+	public Double calContextSimilarityWith(AntiClockwiseSequence target) {
 		
 		MatchList matchList = sharedSpace.getMatchList();
 		ArrayList<Feature> sourceFeatures = new ArrayList<Feature>();
@@ -114,13 +114,13 @@ public class AntiClockwiseSequence {
 				break;
 			}
 		}
-		if (visualize) {
-			System.out.print(String.format(("(%d/%d, %.3f): "), (int)maxInOrder, (int)smallerLength, (maxInOrder/smallerLength)));
-			for (Feature f : target.getFeatureList()) {
-				System.out.print(f.getID() + " ");
-			}
-			System.out.println();
-		}
+//		if (visualize) {
+//			System.out.print(String.format(("(%d/%d, %.3f): "), (int)maxInOrder, (int)smallerLength, (maxInOrder/smallerLength)));
+//			for (Feature f : target.getFeatureList()) {
+//				System.out.print(f.getID() + " ");
+//			}
+//			System.out.println();
+//		}
 		return maxInOrder / smallerLength;
 	}
 	

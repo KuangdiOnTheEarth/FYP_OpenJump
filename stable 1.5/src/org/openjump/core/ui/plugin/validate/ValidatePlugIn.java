@@ -210,7 +210,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			/*
 			 * Calculate context similarity & object similarity.
 			 */
-			double contextSimilarity = calContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr, false);
+			double contextSimilarity = calContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr);
 			matchList.setContextSimilarity(sourceFeature, contextSimilarity);
 			double objectSimilarity = objectSimilarityCalculator.calObjectSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature));
 			matchList.setObjectSimilarity(sourceFeature, objectSimilarity);
@@ -276,7 +276,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			 */
 			for (Feature potentialMatchedObject : tempMatch) {
 				ArrayList<Feature> sourceSurr = findSurroundingMatch(singleF, sourceFeatures, null, false, false);
-				double contextSimilarity = calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, false);
+				double contextSimilarity = calContextSimilarity(singleF, potentialMatchedObject, sourceSurr);
 				double objectSimilarity = objectSimilarityCalculator.calObjectSimilarity(singleF, potentialMatchedObject);
 				double confidenceLevel = contextSimilarity*matchList.getContextWeight() + objectSimilarity*(1-matchList.getContextWeight());
 
@@ -285,7 +285,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 					matchList.setAsNew(singleF);
 					supportingRelations.addMatchSpace();
 					findSurroundingMatch(singleF, sourceFeatures, null, true, true);
-					calContextSimilarity(singleF, potentialMatchedObject, sourceSurr, true);
+					calContextSimilarity(singleF, potentialMatchedObject, sourceSurr);
 					matchList.setContextSimilarity(singleF, contextSimilarity);
 					matchList.setObjectSimilarity(singleF, objectSimilarity);
 				}
@@ -382,7 +382,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 			double preCL = matchList.getContextSimilarity(f); // confidence level before re-calculation
 			
 			ArrayList<Feature> sourceSurr = findSurroundingMatch(f, matchList.getSourceList(), null, true, false);
-			double contextSimilarity = calContextSimilarity(f, matchList.getMatchedTargetFeature(f), sourceSurr, true);
+			double contextSimilarity = calContextSimilarity(f, matchList.getMatchedTargetFeature(f), sourceSurr);
 			matchList.setContextSimilarity(f, contextSimilarity);
 			
 			if (preCL >= VALID_THRESHOLD && matchList.getConfidenceLevel(f) < VALID_THRESHOLD) {
@@ -402,8 +402,8 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	/**
 	 * An auxiliary method for calculating context similarity. 
 	 */
-	private double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> sourceSurr, boolean isBackTrack) {
-		return contextSimilarityCalculator.calContextSimilarity(sourceFeature, targetFeature, sourceSurr, isBackTrack);
+	private double calContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> sourceSurr) {
+		return contextSimilarityCalculator.calContextSimilarity(sourceFeature, targetFeature, sourceSurr);
 	}
 	
 	/**

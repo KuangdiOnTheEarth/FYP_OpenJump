@@ -29,7 +29,7 @@ import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
 /**
  * This plugIn should be executed after the validation process
  * This plugIn will show the detail process of the validation, and explanation on the validation result to promote user understanding
- * @author Kuangdi
+ * @author Guangdi Hu
  *
  */
 public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
