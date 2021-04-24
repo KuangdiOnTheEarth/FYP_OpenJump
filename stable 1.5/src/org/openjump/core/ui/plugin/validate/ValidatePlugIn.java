@@ -236,7 +236,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 					matchList.setContextSimilarity(singleF, contextSimilarity);
 					matchList.setObjectSimilarity(singleF, objectSimilarity);
 				} else {
-					System.out.println("failed to match: " + singleF.getID() +  "-" + potentialMatchedObject.getID()+ ": context " + contextSimilarity + " + object " + objectSimilarity + " = confidence " + confidenceLevel);
+//					System.out.println("failed to match: " + singleF.getID() +  "-" + potentialMatchedObject.getID()+ ": context " + contextSimilarity + " + object " + objectSimilarity + " = confidence " + confidenceLevel);
 				}
 			}
 		}

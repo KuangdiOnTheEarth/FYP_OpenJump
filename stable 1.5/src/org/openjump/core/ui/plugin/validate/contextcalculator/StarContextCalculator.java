@@ -70,13 +70,13 @@ public class StarContextCalculator extends AbstractContextCalculator{
 			if (degreeDiff <= degreeRange) {
 				sameSectionCount++;
 			} else {
-				System.out.println("------- Out of range! " + degreeDiff + " exceeds " + degreeRange);
+//				System.out.println("------- Out of range! " + degreeDiff + " exceeds " + degreeRange);
 			}
 		}
 		
 		double res = (double)sameSectionCount / (double)numSurroundingObjects;
 		if (!(res > 1) && !(res <= 1)) {
-			System.out.println(sameSectionCount + " / " + numSurroundingObjects + " = " + res);
+//			System.out.println(sameSectionCount + " / " + numSurroundingObjects + " = " + res);
 		}
 		return res;
 	}

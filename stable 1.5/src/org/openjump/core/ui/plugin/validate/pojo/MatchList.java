@@ -376,8 +376,8 @@ public class MatchList {
 		targetColl = new FeatureDataset(fs);
 		for (int i = 0; i < sourceFeatureList.size(); i++) {
 			if (validationStatuses.get(i) == NEW) {
-				sourceColl.add(sourceFeatureList.get(i).clone(true));
-				targetColl.add(targetFeatureList.get(i).clone(true));
+				sourceColl.add(sourceFeatureList.get(i).clone(false));
+				targetColl.add(targetFeatureList.get(i).clone(false));
 			}
 		}
 		return new Pair<FeatureCollection, FeatureCollection>(sourceColl, targetColl);
