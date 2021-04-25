@@ -19,7 +19,8 @@ public abstract class AbstractContextCalculator {
 	protected SharedSpace sharedSpace;
 	protected MatchList matchList;
 	protected SupportingRelations supportingRelations;
-	protected String name;
+	
+	public abstract String getName();
 	
 	public AbstractContextCalculator() {
 		sharedSpace = SharedSpace.getInstance();
@@ -40,9 +41,9 @@ public abstract class AbstractContextCalculator {
 	 * @param sourceFeature The source layer object involved in the candidate match
 	 * @param targetFeature The target layer (reference layer) object involved in the candidate match
 	 * @param sourceSurr The source layer objects involved in supporting matches
-	 * @return context similarity
+	 * @return Information about detailed process in context similarity computation
 	 */
-	public abstract double checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr);
+	public abstract String checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr);
 
 	/**
 	 * Refresh and update the supporting relation list

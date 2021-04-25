@@ -2,6 +2,11 @@ package org.openjump.core.ui.plugin.validate;
 import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
+/**
+ * This extension class is used to load the plug-ins into the OpenJump
+ * @author Guangdi Hu
+ *
+ */
 public class ValidationExtension extends Extension {
 
     public String getName() {

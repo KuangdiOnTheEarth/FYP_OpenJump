@@ -17,7 +17,7 @@ import com.vividsolutions.jump.feature.Feature;
 public class StarContextCalculator extends AbstractContextCalculator{
 	
 	private int degreeRange;
-	private String name = "Star Calculus Context Similarity";
+	private String name = "Angle-Difference Context Similarity";
 	
 	public StarContextCalculator(int degreeSectionRange) {
 		this.degreeRange = degreeSectionRange;
@@ -79,12 +79,13 @@ public class StarContextCalculator extends AbstractContextCalculator{
 	/**
 	 * Record and report the detailed process in context similarity computation.
 	 */
-	public double checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr) {
+	public String checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr) {
+		String info = new String();
 		if (srcSurr == null) {
 			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
 		}
 		if (srcSurr.size() == 0) {
-			return 0.0;
+			return "";
 		}
 		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
 		for (Feature f : srcSurr) {
@@ -136,54 +137,70 @@ public class StarContextCalculator extends AbstractContextCalculator{
 		
 		double res = (double)sameSectionCount / (double)numSurroundingObjects;
 		
-		System.out.println(name + ": " + String.format("%.4f (%d/%d)", res, sameSectionCount, numSurroundingObjects));
+		info += String.format("     Proportion of matches within angle tolerance (%d degrees): %d/%d = %.4f<br>", degreeRange, sameSectionCount, numSurroundingObjects, res);
 		
 		/*
 		 *  Print the list of degrees
 		 */
-		System.out.println(sourceFeature.getID() + ": ");
-		System.out.print("source: ");
+		info += "     Contextual objects in source layer: ";
 		for (int i = 0; i < sourceDegrees.size(); i++) {
-			System.out.print(sourceMatchedFeatures.get(i).getID() + " ");
+			info += (sourceMatchedFeatures.get(i).getID() + " ");
 		}
-		System.out.print("\nsource: ");
+		info += "<br>";
+		
+		info += "     Angles of source layer contextual objects: ";
 		for (int i = 0; i < sourceDegrees.size(); i++) {
-			System.out.print(String.format("%.4f ", sourceDegrees.get(i)));
+			info += String.format("%.4f; ", sourceDegrees.get(i));
 		}
-		System.out.print("\ntarget: ");
+		info += "<br>";
+		
+		info += "     Angles of target layer contextual objects: ";
 		for (int i = 0; i < targetDegrees.size(); i++) {
-			System.out.print(String.format("%.4f ", targetDegrees.get(i)));
+			info += String.format("%.4f; ", targetDegrees.get(i));
 		}
-		System.out.println("\n(" + sameSectionCount + " / " + numSurroundingObjects + ") = " + res);
+		info += "<br>";
+		
+		info += "     Angles differences of contextual matches: ";
+		for (int i = 0; i < sourceDegrees.size(); i++) {
+			double degreeDiff = Math.abs(sourceDegrees.get(i) - targetDegrees.get(i));
+			if (degreeDiff > 180) {
+				degreeDiff = 360 - degreeDiff;
+			}
+			info += String.format("%.4f; ", degreeDiff);
+		}
+		info += "<br>";
 
 		/*
 		 *  Print invalid supporting matches
 		 */
 		if (invalidSourceFeatures.size() > 0) {
-			System.out.println("A match with degree difference smaller than " + sharedSpace.ANGLE_TOLERANCE + " is considered as valid supporting match");
-			System.out.println("The following surrounding matches indicates a low context similarity:");
+			info += "<br>     Matches with degree difference smaller than " + sharedSpace.ANGLE_TOLERANCE + " is allowed <br>";
+			info += "     The angle differences of the following matches exceed the angle tolerance:<br>";
 			for (int i = 0; i < invalidSourceFeatures.size(); i++) {
 				double degreeDiff = Math.abs(sourceDegrees.get(invalidFeatureIndices.get(i)) - targetDegrees.get(invalidFeatureIndices.get(i)));
-				System.out.println("\t" + invalidSourceFeatures.get(i).getID() + "--" + invalidTargetFeatures.get(i).getID() + ": degree difference: " + String.format("%.4f", degreeDiff));
+				if (degreeDiff > 180) {
+					degreeDiff = 360 - degreeDiff;
+				}
+			    info += ("          " + invalidSourceFeatures.get(i).getID() + "--" + invalidTargetFeatures.get(i).getID() + ": degree difference: " + String.format("%.4f", degreeDiff) + "<br>");
 			}
 		}
 		/*
 		 *  Print the unmatched surrounding features
 		 */
-		if (sourceUnMatchedFeatures.size() > 0 || targetUnMatchedFeatures.size() > 0) {
-			System.out.println("The following surrounding object has no matching relations: ");
-			for (int i = 0; i < sourceUnMatchedFeatures.size(); i++) {
-				System.out.println("\tSource layer object id = " + sourceUnMatchedFeatures.get(i).getID());
-			}
-			for (int i = 0; i < targetUnMatchedFeatures.size(); i++) {
-				System.out.println("\tTarget layer object id = " + targetUnMatchedFeatures.get(i).getID());
-			}
-		}
+//		if (sourceUnMatchedFeatures.size() > 0 || targetUnMatchedFeatures.size() > 0) {
+//			System.out.println("The following surrounding object has no matching relations: ");
+//			for (int i = 0; i < sourceUnMatchedFeatures.size(); i++) {
+//				System.out.println("\tSource layer object id = " + sourceUnMatchedFeatures.get(i).getID());
+//			}
+//			for (int i = 0; i < targetUnMatchedFeatures.size(); i++) {
+//				System.out.println("\tTarget layer object id = " + targetUnMatchedFeatures.get(i).getID());
+//			}
+//		}
 		 
 		 
 		sharedSpace.storeInvalidSurrMatchList(invalidSourceFeatures, invalidTargetFeatures);
 		
-		return res;
+		return info;
 	}
 	
 
@@ -237,5 +254,11 @@ public class StarContextCalculator extends AbstractContextCalculator{
 			targetFeatures.add(targetF);
 		}
 		return targetFeatures;
+	}
+
+
+	@Override
+	public String getName() {
+		return name;
 	}
 }

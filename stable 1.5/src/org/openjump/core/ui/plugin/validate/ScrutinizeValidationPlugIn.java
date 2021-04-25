@@ -110,8 +110,8 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 		result += "Validation Result: " + (matchList.getConfidenceLevel(sourceFeature)>=matchList.getValidThreshold()?"Valid<br>":"Invalid<br>");
 		result += "Confidence Level: " + String.format("%.4f", matchList.getConfidenceLevel(sourceFeature)) + " ( threshold: " + matchList.getValidThreshold() + " )<br>";
 		result += "\tContext Similarity: " + String.format("%.4f", matchList.getContextSimilarity(sourceFeature)) + " ( weight: " + String.format("%.2f", matchList.getContextWeight()) + " )<br>"; 
-		result += "\tObject Similarity: " + String.format("%.4f", matchList.getObjectSimilarity(sourceFeature)) + " ( weight: " + String.format("%.2f", 1-matchList.getContextWeight()) + " )<br></html>"; 
-		result += "Details: ";
+		result += "\tObject Similarity: " + String.format("%.4f", matchList.getObjectSimilarity(sourceFeature)) + " ( weight: " + String.format("%.2f", 1-matchList.getContextWeight()) + " )<br>"; 
+		result += "<br>Details in context similarity computation: <br>";
 		Geometry sfGeom = sourceFeature.getGeometry();
 		Geometry buffer = sfGeom.buffer(matchList.getBufferRadius(sourceFeature));
 		
@@ -148,7 +148,8 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
         // create list to contain the target objects from invalid matches
 //        StarContextCalculator contextCalculator = new StarContextCalculator(sharedSpace.STAR_DEGREE_RANGE);
         AbstractContextCalculator contextCalculator = sharedSpace.getContextCalculator();
-        contextCalculator.checkContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr);
+        result += ("Context similarity measure: " + contextCalculator.getName() + "<br>");
+        result += contextCalculator.checkContextSimilarity(sourceFeature, matchList.getMatchedTargetFeature(sourceFeature), sourceSurr);
         ArrayList<Feature> invalidMatches = sharedSpace.getInvalidSurrMatchList().getValue();
 
         surrColl = new FeatureDataset(fs);
@@ -167,6 +168,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 		
 		
 		System.out.println("done\n");
+		result += "</html>";
 		showResult(context, result);
 		
 	}

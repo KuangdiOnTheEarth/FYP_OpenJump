@@ -19,7 +19,7 @@ import com.vividsolutions.jump.feature.Feature;
  */
 public class RouteContextCalculator extends AbstractContextCalculator{
 	
-	private String name = "Sequence Order Context Similarity";
+	private String name = "Sequence-Order Context Similarity";
 	
 	/**
 	 * Calculate the context similarity using angle difference measure.
@@ -49,12 +49,12 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 	 * Record and report the detailed process in context similarity computation.
 	 */
 	@Override
-	public double checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr) {
+	public String checkContextSimilarity(Feature sourceFeature, Feature targetFeature, ArrayList<Feature> srcSurr) {		
 		if (srcSurr == null) {
 			srcSurr = supportingRelations.getSupportingFeaturesOf(sourceFeature);
 		}
 		if (srcSurr.size() == 0) {
-			return 0.0;
+			return "";
 		}
 		ArrayList<Feature> sourceSurr = new ArrayList<Feature>();
 		for (Feature f : srcSurr) {
@@ -65,7 +65,7 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 		System.out.println("Checking " + this.name);
 		AntiClockwiseSequence sourceSeq = orderFeaturesClockwise(sourceSurr, sourceFeature);
 		AntiClockwiseSequence targetSeq = orderFeaturesClockwise(findCorrespondingFeatures(sourceSurr), targetFeature);
-		return sourceSeq.checkContextSimilarityWith(targetSeq, true);
+		return sourceSeq.checkContextSimilarityWith(targetSeq);
 	}
 	
 	/**
@@ -114,6 +114,13 @@ public class RouteContextCalculator extends AbstractContextCalculator{
 			}
 		}
 		return targetFeatures;
+	}
+
+
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 }

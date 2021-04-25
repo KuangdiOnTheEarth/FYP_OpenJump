@@ -134,10 +134,11 @@ public class AntiClockwiseSequence {
 	/**
 	 * Called by the scrutinize plugIn, print out the invalid surrounding matches & store them into sharedSpace for later visualization
 	 * @param target Another sequence to be compared with
-	 * @param visualize
-	 * @return
+	 * @return information about context similarity computation
 	 */
-	public Double checkContextSimilarityWith(AntiClockwiseSequence target, boolean visualize) {
+	public String checkContextSimilarityWith(AntiClockwiseSequence target) {
+		
+		String info = new String();
 		
 		MatchList matchList = sharedSpace.getMatchList();
 		ArrayList<Feature> sourceFeatures = new ArrayList<Feature>();
@@ -166,7 +167,7 @@ public class AntiClockwiseSequence {
 			}
 		}
 		if (corrIndices.size() == 0) {
-			return 0.0;
+			return "";
 		}
 		
 		ArrayList<Feature> invalidSourceFeatures = new ArrayList<Feature>();
@@ -214,16 +215,17 @@ public class AntiClockwiseSequence {
 			}
 		}
 		sharedSpace.storeInvalidSurrMatchList(invalidSourceFeatures, invalidTargetFeatures);
-		if (visualize) {
-			System.out.println(String.format(("(%d/%d, %.3f): "), (int)maxInOrder, (int)smallerLength, (maxInOrder/smallerLength)));
 
-			System.out.println("The following surrounding matches are not inorder amonge the neighbouring sequence:");
-			System.out.println(invalidSourceFeatures.size() + " " + invalidTargetFeatures.size());
+		info += (String.format(("     Proportion of in-order matches in context: %d/%d = %.3f"), (int)maxInOrder, (int)smallerLength, (maxInOrder/smallerLength)) + "<br>");
 
+		if (invalidSourceFeatures.size() > 0) {
+			info += "     The following matches are not in-order amonge the context:<br>";
 			for (int i = 0; i < invalidSourceFeatures.size(); i++) {
-				System.out.println("\t" + invalidSourceFeatures.get(i).getID() + " -- " + invalidTargetFeatures.get(i).getID());
+				info += ("          " + invalidSourceFeatures.get(i).getID() + " -- " + invalidTargetFeatures.get(i).getID() + "<br>");
 			}
 		}
-		return maxInOrder / smallerLength;
+
+			
+		return info;
 	}
 }
