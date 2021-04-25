@@ -8,19 +8,13 @@ import java.util.Random;
 
 import org.openjump.core.ui.plugin.AbstractUiPlugIn;
 import org.openjump.core.ui.plugin.validate.contextcalculator.AbstractContextCalculator;
-import org.openjump.core.ui.plugin.validate.contextcalculator.RouteContextCalculator;
-import org.openjump.core.ui.plugin.validate.contextcalculator.StarContextCalculator;
 import org.openjump.core.ui.plugin.validate.objectcalculator.AbstractObjectCalculator;
-import org.openjump.core.ui.plugin.validate.pojo.AntiClockwiseSequence;
 import org.openjump.core.ui.plugin.validate.pojo.MatchList;
 import org.openjump.core.ui.plugin.validate.pojo.SupportingRelations;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
-import com.vividsolutions.jump.feature.FeatureDataset;
-import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.StandardCategoryNames;
@@ -85,7 +79,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 	    FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
 	    featureInstaller.addMainMenuItem(
 	    	        this,
-	                new String[] {"Kuangdi"}, 	//menu path
+	                new String[] {"ValidateMatches"}, 	//menu path
 	                this.getName(),
 	                false,			//checkbox
 	                null,			//icon
@@ -415,7 +409,7 @@ public class ValidatePlugIn extends AbstractUiPlugIn implements ThreadedPlugIn {
 		context.addLayer(StandardCategoryNames.WORKING, "Valid Matches", pair.getKey());
 		context.addLayer(StandardCategoryNames.WORKING, "Invalid Matches", pair.getValue());
 		Pair<FeatureCollection, FeatureCollection> npair = matchList.getNewMatches();
-		context.addLayer(StandardCategoryNames.WORKING, "New Matches -- source layer", npair.getKey());
+		context.addLayer(StandardCategoryNames.WORKING, "Missing Matches", npair.getKey());
 //		context.addLayer(StandardCategoryNames.WORKING, "New Matches -- target layer", npair.getValue());
 		System.out.println("result\nvalid matches: " + pair.getKey().size() +"; invalide matches: " + pair.getValue().size() + "; new matches: " + npair.getKey().size());
 	}

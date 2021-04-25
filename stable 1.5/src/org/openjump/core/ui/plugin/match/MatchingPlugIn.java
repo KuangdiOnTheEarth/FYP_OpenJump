@@ -194,7 +194,7 @@ public class MatchingPlugIn extends ThreadedBasePlugIn {
     public void initialize(PlugInContext context) throws Exception {
         
         context.getFeatureInstaller().addMainMenuItem(
-          this, new String[]{"Kuangdi"},
+          this, new String[]{"ValidateMatches"},
           MATCHING + "...",
           false, null, new MultiEnableCheck()
           .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())

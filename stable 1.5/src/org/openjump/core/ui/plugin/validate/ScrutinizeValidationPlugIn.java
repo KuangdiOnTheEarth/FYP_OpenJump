@@ -39,7 +39,6 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
     private String T2 = "select layer";
     private String T3 = "object ID";
 
-    private Layer itemlayer = null;
     private int featureID = 0;
     
 	
@@ -51,7 +50,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 	    FeatureInstaller featureInstaller = new FeatureInstaller(context.getWorkbenchContext());
 	    featureInstaller.addMainMenuItem(
 	    	        this,
-	                new String[] {"Kuangdi"}, 	//menu path
+	                new String[] {"ValidateMatches"}, 	//menu path
 	                "Scrutinize",
 	                false,			//checkbox
 	                null,			//icon
@@ -144,7 +143,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
 			cp.setGeometry(f.getGeometry().getCentroid());
 			surrColl.add(cp);
         }
-        context.addLayer(StandardCategoryNames.WORKING, "check" + sourceFeature.getID(), surrColl);			
+        context.addLayer(StandardCategoryNames.WORKING, "Context of " + sourceFeature.getID(), surrColl);			
 
         // create list to contain the target objects from invalid matches
 //        StarContextCalculator contextCalculator = new StarContextCalculator(sharedSpace.STAR_DEGREE_RANGE);
@@ -164,7 +163,7 @@ public class ScrutinizeValidationPlugIn extends AbstractUiPlugIn implements Thre
         Feature targetCentroid = targetFeature.clone(false);
         targetCentroid.setGeometry(targetFeature.getGeometry().getCentroid());
         surrColl.add(targetCentroid); // add centroid of target object
-        context.addLayer(StandardCategoryNames.WORKING, "invalid surr " + sourceFeature.getID(), surrColl);	
+        context.addLayer(StandardCategoryNames.WORKING, "Discrepancy" + sourceFeature.getID(), surrColl);	
 		
 		
 		System.out.println("done\n");

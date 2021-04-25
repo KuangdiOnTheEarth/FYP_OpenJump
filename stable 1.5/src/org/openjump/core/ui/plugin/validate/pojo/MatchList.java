@@ -1,7 +1,6 @@
 package org.openjump.core.ui.plugin.validate.pojo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Queue;
 
 import com.vividsolutions.jump.feature.Feature;
